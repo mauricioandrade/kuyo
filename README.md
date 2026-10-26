@@ -1,60 +1,93 @@
-# kuyo
+# Kuyō 供養
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+**A funeral for the code that's gone.**
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+In Japan, *kuyō* is a memorial service for objects that served well: needles, dolls, brushes, even eyeglasses. They are thanked and laid to rest instead of just thrown away.
 
-## Running the application in dev mode
+Kuyō does the same for source code. It reads a repository's git history, finds every file that was deleted, and holds a funeral for each one: how it lived, how it died, and how restless its soul is. A local open-weight model writes the epitaphs, and the result is a cemetery in a single HTML page, where restless souls haunt their graves.
 
-You can run your application in dev mode that enables live coding using:
+Your code never leaves your machine. Everything runs offline, with a model you control.
 
-```shell script
-./mvnw quarkus:dev
-```
+> Built for the DEV Hacktoberfest 2026 challenge, week 4: *Ghost in the Machine*.
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+## Status
 
-## Packaging and running the application
+| Command | What it does | State |
+|---|---|---|
+| `kuyo scan <repo>` | Lists the dead and their cause of death, no LLM | ✅ working |
+| `kuyo bury <repo> [-o out]` | Writes epitaphs with Gemma and renders the cemetery | 🚧 in progress |
+| `kuyo seance <repo> <file>` | Talk to a dead file | 💭 if time allows |
 
-The application can be packaged using:
+## Requirements
 
-```shell script
+- Java 25 (the repo pins it with [mise](https://mise.jdx.dev): `mise install`)
+- For `bury`: [Ollama](https://ollama.com) with a Gemma model, e.g. `ollama pull gemma4:e4b`
+
+## Usage
+
+```bash
 ./mvnw package
+java -jar target/quarkus-app/quarkus-run.jar scan path/to/repo
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Options for `scan`:
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+- `--ordem inquietacao` sorts by restlessness instead of chronologically
+- `--laudo` prints every factor behind the restlessness score
 
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+```
+✝ src/lib/rate-limit.ts  [VIOLENTA · 0.66]
+    2026-06-05 02:14 → 2026-06-12 01:55 -03:00  (6 dias, 1 commits, 16 linhas)
+    autores: mauricioandrade
+    morto em 135a99b3 por mauricioandrade: "fix: limite de tamanho nos inputs de palpites e awards; remove rate-limit em memoria"
+    commit: 3 arquivos, -18 linhas, sem testes
+    laudo: tamanho 0.39 · hora 1.00 · mensagem 1.00 · sem testes 1.00 · vida curta 0.22
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+Deleted at 1:55 a.m., in a commit whose message says `remove`, with no tests. A violent death.
 
-## Creating a native executable
+The CLI output is in Portuguese for now; epitaphs will default to English (`--lang en|pt`).
 
-You can create a native executable using:
+## How a death is investigated
 
-```shell script
-./mvnw package -Dnative
-```
+### Exhumation
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+Kuyō reads history with [JGit](https://www.eclipse.org/jgit/), in pure Java, without calling the `git` binary. It walks the first-parent history from the oldest commit to the newest:
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
+- **Renames and moves are not deaths.** The file's life continues under its new path, using the same 50% similarity threshold as `git` itself.
+- **Resurrections count as new lives.** A file deleted and later recreated at the same path dies twice.
+- **A merge is one event.** The same deletion is never counted twice, and files that died on branches never merged are left alone.
+- **OS junk gets no funeral** (`*:Zone.Identifier`, `.DS_Store`, `Thumbs.db`).
 
-You can then execute your native executable with: `./target/kuyo-0.1.0-SNAPSHOT-runner`
+### Restlessness
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+Restlessness is a score from 0 to 1, computed deterministically in Java. The model only ever receives the result, never decides it.
 
-## Related Guides
+| Factor | Weight | Rule |
+|---|---|---|
+| Size of the death commit | 0.30 | log scale, maxes out at 50 files or 2,000 lines removed |
+| Hour of death | 0.15 | midnight to 5 a.m. in the author's own timezone; 10 p.m. to midnight counts half |
+| Commit message | 0.20 | empty, or contains `remove`, `delete`, `wip`, `hotfix`, `cleanup`, `oops` (and Portuguese equivalents) |
+| No tests | 0.15 | source file deleted in a commit that touched no tests |
+| Short life | 0.20 | log scale in hours: one hour ≈ 0.9, one day ≈ 0.5, zero at 30 days |
 
-- Qute ([guide](https://quarkus.io/guides/qute)): Offer templating support for web, email, etc in a build time, type-safe way
-- Picocli ([guide](https://quarkus.io/guides/picocli)): Develop command line applications with Picocli
-- LangChain4j Ollama ([guide](https://docs.quarkiverse.io/quarkus-langchain4j/dev/guide-ollama.html)): Provides the basic integration of Ollama with LangChain4j
+The weights were calibrated against 175 real deaths across nine of my own repositories. The first draft used linear scales, which saturated almost immediately: in practice files die young and in mass graves.
+
+### Cause of death
+
+Checked in this order:
+
+1. **VIOLENTA** (violent): restlessness ≥ 0.6
+2. **PREMATURA** (premature): lived less than a day
+3. **ESQUECIDA** (forgotten): untouched for more than a year before deletion
+4. **NATURAL**: everything else
+
+`.gitkeep` files always die of natural causes. They exist to be replaced by real code, so their mission was accomplished.
+
+## Why local and open
+
+Proprietary code can't be sent to a closed API. Kuyō runs entirely on your machine, costs nothing per run, works offline, and the model is just a configuration value you can swap.
+
+## Stack
+
+Java 25 · Quarkus (picocli) · JGit · LangChain4j + Ollama · Gemma · Qute
