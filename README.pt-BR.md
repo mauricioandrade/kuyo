@@ -30,7 +30,7 @@ Feito para o desafio DEV Hacktoberfest 2026, semana 4: *Ghost in the Machine*.
 | Comando | O que faz | Estado |
 |---|---|---|
 | `kuyo scan <repo>` | Lista os mortos e a causa mortis, sem LLM | ✅ funcionando |
-| `kuyo bury <repo> [-o saida]` | Escreve os epitáfios com o Gemma e gera o cemitério | 🚧 em andamento |
+| `kuyo bury <repo> [-o saida]` | Escreve os epitáfios com o Gemma e gera o cemitério | ✅ epitáfios · 🚧 cemitério assombrado |
 | `kuyo seance <repo> <arquivo>` | Conversa com um arquivo morto | 💭 se der tempo |
 
 ## 🚀 Começando
@@ -63,6 +63,28 @@ java -jar target/quarkus-app/quarkus-run.jar scan caminho/do/repo
 
 Apagado à 1h55 da manhã, num commit cuja mensagem diz `remove`, sem testes. Uma morte violenta.
 
+### 🕯️ Sepultando
+
+```bash
+java -jar target/quarkus-app/quarkus-run.jar bury caminho/do/repo -o cemiterio.html --lang pt
+```
+
+O Gemma escreve um epitáfio por alma, cerca de um segundo cada numa GPU de notebook:
+
+> Aqui jaz src/lib/rate-limit.ts, que serviu por seis dias guardando os limites. Seu fim veio com a resignação: "Remove src/lib/rate-limit.ts, que nao tinha mais nenhum uso — o Map em memoria nao funciona em serverless".
+
+| Opção | Efeito |
+|---|---|
+| `--lang en\|pt` | língua dos epitáfios (padrão `en`) |
+| `--sem-epitafios` | gera o cemitério sem chamar o modelo |
+
+Os epitáfios ficam em cache num `kuyo.json` ao lado da saída, pela chave commit da morte, língua e modelo, então rodar de novo é instantâneo. O modelo é configurado em tempo de execução, sem recompilar:
+
+| Variável de ambiente | Padrão |
+|---|---|
+| `KUYO_MODELO` | `gemma4:e4b` |
+| `KUYO_OLLAMA_URL` | `http://localhost:11434` |
+
 ## 🔍 Como uma morte é investigada
 
 ### ⛏️ Exumação
@@ -76,7 +98,7 @@ O Kuyō lê o histórico com o [JGit](https://www.eclipse.org/jgit/), em Java pu
 
 ### 👻 Inquietação
 
-A inquietação é uma nota de 0 a 1, calculada de forma determinística em Java. O modelo só recebe o resultado, nunca decide.
+A inquietação é uma nota de 0 a 1, calculada de forma determinística em Java. O modelo só recebe o resultado, nunca decide: os fatos são do Java, as palavras são do Gemma.
 
 | Fator | Peso | Regra |
 |---|---|---|

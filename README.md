@@ -30,7 +30,7 @@ Built for the DEV Hacktoberfest 2026 challenge, week 4: *Ghost in the Machine*.
 | Command | What it does | State |
 |---|---|---|
 | `kuyo scan <repo>` | Lists the dead and their cause of death, no LLM | ✅ working |
-| `kuyo bury <repo> [-o out]` | Writes epitaphs with Gemma and renders the cemetery | 🚧 in progress |
+| `kuyo bury <repo> [-o out]` | Writes epitaphs with Gemma and renders the cemetery | ✅ epitaphs · 🚧 haunted cemetery |
 | `kuyo seance <repo> <file>` | Talk to a dead file | 💭 if time allows |
 
 ## 🚀 Getting started
@@ -63,7 +63,29 @@ java -jar target/quarkus-app/quarkus-run.jar scan path/to/repo
 
 Deleted at 1:55 a.m., in a commit whose message says `remove`, with no tests. A violent death.
 
-The CLI output is in Portuguese for now; epitaphs will default to English (`--lang en|pt`).
+The CLI output is in Portuguese for now.
+
+### 🕯️ Burying
+
+```bash
+java -jar target/quarkus-app/quarkus-run.jar bury path/to/repo -o cemiterio.html
+```
+
+Gemma writes one epitaph per soul, about a second each on a laptop GPU:
+
+> Here rests SpikeResource.java, a brief experiment that lasted but nine hours. It met its end with the decree, "chore(web): remove phase 2 spike endpoint." May its ephemeral existence find quiet in the void.
+
+| Option | Effect |
+|---|---|
+| `--lang en\|pt` | language of the epitaphs (default `en`) |
+| `--sem-epitafios` | render the cemetery without calling the model |
+
+Epitaphs are cached in a `kuyo.json` next to the output, keyed by death commit, language and model, so reruns are instant. The model is configured at runtime, no rebuild needed:
+
+| Environment variable | Default |
+|---|---|
+| `KUYO_MODELO` | `gemma4:e4b` |
+| `KUYO_OLLAMA_URL` | `http://localhost:11434` |
 
 ## 🔍 How a death is investigated
 
@@ -78,7 +100,7 @@ Kuyō reads history with [JGit](https://www.eclipse.org/jgit/), in pure Java, wi
 
 ### 👻 Restlessness
 
-Restlessness is a score from 0 to 1, computed deterministically in Java. The model only ever receives the result, never decides it.
+Restlessness is a score from 0 to 1, computed deterministically in Java. The model only ever receives the result, never decides it: the facts are Java's, the words are Gemma's.
 
 | Factor | Weight | Rule |
 |---|---|---|
