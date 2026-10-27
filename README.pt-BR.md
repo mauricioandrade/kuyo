@@ -30,7 +30,7 @@ Feito para o desafio DEV Hacktoberfest 2026, semana 4: *Ghost in the Machine*.
 | Comando | O que faz | Estado |
 |---|---|---|
 | `kuyo scan <repo>` | Lista os mortos e a causa mortis, sem LLM | ✅ funcionando |
-| `kuyo bury <repo> [-o saida]` | Escreve os epitáfios com o Gemma e gera o cemitério | ✅ epitáfios · 🚧 cemitério assombrado |
+| `kuyo bury <repo> [-o saida]` | Escreve os epitáfios com o Gemma e gera o cemitério | ✅ funcionando |
 | `kuyo seance <repo> <arquivo>` | Conversa com um arquivo morto | 💭 se der tempo |
 
 ## 🚀 Começando
@@ -69,7 +69,7 @@ Apagado à 1h55 da manhã, num commit cuja mensagem diz `remove`, sem testes. Um
 java -jar target/quarkus-app/quarkus-run.jar bury caminho/do/repo -o cemiterio.html --lang pt
 ```
 
-O Gemma escreve um epitáfio por alma, cerca de um segundo cada numa GPU de notebook:
+O Gemma escreve um epitáfio por alma, cerca de um segundo cada numa GPU de notebook, e o Kuyō gera um único `cemiterio.html` autocontido: uma caminhada noturna por um cemitério japonês, um terraço por mês (ou por dia, quando um mês tem mortes demais). A altura do pilar é o tempo de vida do arquivo, as chamas são a inquietação, túmulos violentos ficam tortos e erguem um yūrei, os esquecidos criam musgo. Aproxime-se de um túmulo para ler o epitáfio.
 
 > Aqui jaz src/lib/rate-limit.ts, que serviu por seis dias guardando os limites. Seu fim veio com a resignação: "Remove src/lib/rate-limit.ts, que nao tinha mais nenhum uso — o Map em memoria nao funciona em serverless".
 
@@ -130,6 +130,8 @@ Código proprietário não pode ser enviado para uma API fechada. O Kuyō roda i
 Java 25 · Quarkus (picocli) · JGit · LangChain4j + Ollama · Gemma · Qute
 
 Todo o visual, incluindo o banner acima, é desenhado à mão em SVG e CSS. Nenhuma imagem baixada.
+
+O cemitério usa a [Shippori Mincho B1](https://github.com/fontdasu/ShipporiMincho), dos Shippori Mincho Project Authors, sob a [SIL Open Font License](src/main/resources/fonts/OFL.txt), embutida em recortes pequenos para a página continuar um arquivo único e offline.
 
 ## 📜 Licença
 

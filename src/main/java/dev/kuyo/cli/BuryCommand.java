@@ -1,6 +1,7 @@
 package dev.kuyo.cli;
 
-import dev.kuyo.cemiterio.Tumulo;
+import dev.kuyo.cemiterio.Cemiterio;
+import dev.kuyo.cemiterio.Textos;
 import dev.kuyo.dominio.Alma;
 import dev.kuyo.dominio.Legista;
 import dev.kuyo.epitafio.Epitafista;
@@ -84,10 +85,7 @@ public class BuryCommand implements Callable<Integer> {
         }
 
         String nomeRepo = repo.toAbsolutePath().normalize().getFileName().toString().replaceFirst("\\.git$", "");
-        String html = cemiterio
-                .data("repo", nomeRepo)
-                .data("almas", almas.stream().map(Tumulo::de).toList())
-                .render();
+        String html = cemiterio.data("c", Cemiterio.montar(nomeRepo, almas, Textos.de(lingua))).render();
         Files.writeString(saida, html);
         System.out.printf("%n%d almas sepultadas em %s%n", almas.size(), saida.toAbsolutePath());
         return 0;

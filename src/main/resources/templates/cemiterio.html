@@ -1,37 +1,489 @@
 <!doctype html>
-<html lang="en">
+<html lang="{c.textos.lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kuyō · {repo}</title>
+<meta name="color-scheme" content="dark">
+<title>Kuyō 供養 · {c.repo}</title>
 <style>
-  :root { color-scheme: dark; --ceu: #0d0b18; --pedra: #3f3b55; --texto: #e9e4ff; --suave: #a9a3c4; }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--ceu); color: var(--texto); font: 16px/1.5 Georgia, serif; }
-  header { text-align: center; padding: 48px 16px 24px; }
-  header h1 { margin: 0; font-size: 2.6rem; font-weight: normal; }
-  header p { margin: 4px 0 0; color: var(--suave); font-style: italic; }
-  main { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; padding: 24px 16px 64px; max-width: 1200px; margin: 0 auto; }
-  .tumulo { background: var(--pedra); border-radius: 120px 120px 8px 8px; padding: 56px 20px 24px; text-align: center; }
-  .tumulo h2 { margin: 0; font-size: 1.1rem; word-break: break-all; }
-  .datas, .causa { color: var(--suave); font-size: .85rem; margin: 4px 0; }
-  .epitafio { font-style: italic; margin: 16px 0 0; }
+@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f400latin')}) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f400latinext')}) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700latin')}) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700latinext')}) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+{! o Chrome agrupa faces por peso antes de combinar unicode-range: os kanji precisam de uma face em cada peso !}
+@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF; }
+@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF; }
 </style>
+<style>{|
+:root {
+  --noite: #0d1130;
+  --noite-alta: #070920;
+  --horizonte: #1d2452;
+  --chao: #1a1f45;
+  --chao-borda: #3b4170;
+  --granito: #565b74;
+  --granito-luz: #7a809b;
+  --granito-sombra: #343850;
+  --ouro: #eadcb0;
+  --madeira: #c8b48a;
+  --madeira-sombra: #9c8862;
+  --musgo: #5d7a45;
+  --washi: #f1e9d8;
+  --washi-fundo: #e7dcc4;
+  --sumi: #231d19;
+  --sumi-suave: #5a4f45;
+  --shu: #c8402b;
+  --lanterna: #ff9a48;
+  --chama-calma: #a8dcff;
+  --chama-agitada: #80aaff;
+  --chama-violenta: #b98dff;
+  --texto: #ece7f7;
+  --texto-suave: #b2aed0;
+  --altura-washi: 132px;
+  --t-tumulo: 1;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scrollbar-color: var(--granito) var(--noite-alta); }
+::selection { background: var(--shu); color: var(--washi); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--noite);
+  color: var(--texto);
+  font: 400 1rem/1.6 "Shippori", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  padding-bottom: calc(var(--altura-washi) + 40px);
+  overflow-x: hidden;
+}
+:focus-visible { outline: 2px solid var(--lanterna); outline-offset: 4px; border-radius: 4px; }
+
+/* ---------- céu ---------- */
+.ceu { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background: linear-gradient(180deg, var(--noite-alta) 0%, var(--noite) 45%, var(--horizonte) 100%); }
+.ceu svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.estrela { fill: #e6e1ff; animation: cintilar 5s ease-in-out infinite; }
+.estrela:nth-child(3n) { animation-delay: -1.7s; animation-duration: 7s; }
+.estrela:nth-child(4n) { animation-delay: -3.1s; }
+.lua { position: absolute; top: 7vh; right: 9vw; width: clamp(64px, 9vw, 120px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #fbf5df 0 45%, #e9dfbd 70%, #d7caa1 100%);
+  box-shadow: 0 0 60px 18px rgba(240, 230, 190, .16), 0 0 160px 60px rgba(240, 230, 190, .06); }
+.colinas { position: absolute; left: 0; right: 0; bottom: 0; height: 32vh; }
+
+/* ---------- portal ---------- */
+.portal { display: grid; justify-items: center; gap: 28px; padding: 0 16px 24px; position: relative; }
+.varal { display: flex; align-items: flex-start; justify-content: center; gap: clamp(16px, 5vw, 64px); width: 100%; max-width: 980px; }
+.kanban { position: relative; margin-top: 64px; background: linear-gradient(180deg, #d6c096, #c3a979 60%, #b29766);
+  color: var(--sumi); padding: 22px clamp(20px, 4vw, 44px) 20px; border-radius: 6px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .55), inset 0 0 0 2px rgba(60, 40, 20, .25);
+  display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: clamp(16px, 3vw, 32px); max-width: 640px; }
+.kanban::before, .kanban::after { content: ""; position: absolute; top: -64px; width: 2px; height: 64px; background: #8a7350; }
+.kanban::before { left: 18%; } .kanban::after { right: 18%; }
+.kanban__kanji { font-weight: 700; font-size: clamp(2.6rem, 7vw, 4.2rem); line-height: 1; writing-mode: vertical-rl; letter-spacing: .08em; color: var(--sumi); }
+.kanban h1 { margin: 0; font-weight: 700; font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.05; letter-spacing: -.01em; }
+.kanban__repo { margin: 6px 0 0; font-size: clamp(1rem, 2.4vw, 1.25rem); color: #3a2f25; overflow-wrap: anywhere; }
+.kanban__total { margin: 10px 0 0; font-size: .95rem; color: #4a3e33; }
+.kanban__total b { font-weight: 700; font-variant-numeric: lining-nums; color: var(--sumi); font-size: 1.15rem; }
+
+.chochin { flex: none; position: relative; width: clamp(44px, 8vw, 74px); margin-top: 24px; animation: balancar 7s ease-in-out infinite; transform-origin: 50% -40px; }
+.chochin:last-child { animation-delay: -3.4s; }
+.chochin::before { content: ""; position: absolute; left: 50%; top: -40px; width: 2px; height: 40px; background: #6a5a44; }
+.chochin__corpo { position: relative; aspect-ratio: 3 / 4.2; border-radius: 46% / 40%;
+  background:
+    repeating-linear-gradient(180deg, rgba(90, 20, 10, .35) 0 1px, transparent 1px 9px),
+    radial-gradient(ellipse at 50% 45%, #ffcf8a 0%, #f1743c 40%, #b8321f 78%, #7d1c12 100%);
+  box-shadow: 0 0 40px 10px rgba(255, 140, 60, .28), 0 0 120px 40px rgba(255, 120, 50, .10);
+  animation: tremeluzir 3.7s steps(1, end) infinite; }
+.chochin:last-child .chochin__corpo { animation-delay: -1.3s; }
+.chochin__corpo::before, .chochin__corpo::after { content: ""; position: absolute; left: 22%; right: 22%; height: 9%; background: #1b1513; border-radius: 3px; }
+.chochin__corpo::before { top: -5%; } .chochin__corpo::after { bottom: -5%; }
+
+.censo { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
+.censo li { display: flex; align-items: center; gap: 10px; color: var(--texto-suave); font-size: .95rem; }
+.censo b { color: var(--texto); font-weight: 700; font-variant-numeric: lining-nums tabular-nums; }
+.selo { display: inline-grid; place-items: center; width: 30px; height: 30px; background: var(--shu); color: var(--washi);
+  font-weight: 700; font-size: .78rem; line-height: 1; border-radius: 4px; writing-mode: vertical-rl; letter-spacing: .02em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .35); }
+.legenda { display: flex; gap: 22px; color: var(--texto-suave); font-size: .85rem; flex-wrap: wrap; justify-content: center; margin: 0; }
+.legenda span { display: inline-flex; align-items: center; gap: 8px; }
+.legenda .hitodama { position: relative; animation: none; margin: 0 -1px; vertical-align: -6px; }
+
+/* ---------- terraços ---------- */
+main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
+.terraco { position: relative; margin-top: 46px; }
+.marco { display: flex; align-items: flex-end; gap: 14px; margin: 0 0 -6px 4px; position: relative; z-index: 1; }
+.marco h2 { margin: 0 0 6px; font-size: clamp(1.15rem, 2.6vw, 1.45rem); font-weight: 700; letter-spacing: .01em; }
+.marco p { margin: 0 0 8px; color: var(--texto-suave); font-size: .9rem; font-variant-numeric: lining-nums; }
+.toro { flex: none; width: 34px; display: grid; justify-items: center; }
+.toro__kasa { width: 34px; height: 10px; background: var(--granito-luz); clip-path: polygon(12% 0, 88% 0, 100% 100%, 0 100%); }
+.toro__luz { width: 20px; height: 15px; background: var(--granito); display: grid; place-items: center; }
+.toro__luz::after { content: ""; width: 10px; height: 9px; background: #ffc27a; border-radius: 1px; box-shadow: 0 0 14px 5px rgba(255, 170, 90, .45); animation: tremeluzir 4.3s steps(1, end) infinite; }
+.toro__haste { width: 10px; height: 26px; background: var(--granito-sombra); }
+.toro__pe { width: 26px; height: 7px; background: var(--granito); }
+
+.fileira { list-style: none; margin: 0; padding: 18px 8px 0 8px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 30px 26px; }
+.fileira li { position: relative; }
+.fileira li::before { content: ""; position: absolute; left: -14px; right: -14px; bottom: 0; height: 22px;
+  background: linear-gradient(180deg, var(--chao-borda) 0 2px, var(--chao) 2px); }
+.fileira li:first-child::before { left: -8px; }
+.degrau { height: 14px; background: linear-gradient(180deg, var(--chao-borda), var(--chao)); border-radius: 0 0 3px 3px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .35); }
+
+/* ---------- túmulo ---------- */
+.tumulo { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: grid; justify-items: center; align-content: end;
+  width: calc(108px * var(--t-tumulo)); padding-top: 64px; -webkit-tap-highlight-color: transparent; }
+.tumulo:focus-visible { outline: 2px solid var(--lanterna); outline-offset: 6px; border-radius: 6px; }
+.tumulo__sotoba { position: absolute; bottom: 30px; left: 58%; display: flex; gap: 3px; z-index: 0; }
+.tumulo__sotoba span { width: 9px; height: calc(var(--h) * .95 + 40px); background: linear-gradient(90deg, var(--madeira), var(--madeira-sombra));
+  clip-path: polygon(50% 0, 100% 9px, 100% 22px, 82% 26px, 100% 30px, 100% 100%, 0 100%, 0 30px, 18% 26px, 0 22px, 0 9px); opacity: .9; }
+.tumulo__sotoba span:nth-child(2) { height: calc(var(--h) * .8 + 34px); transform: rotate(4deg); transform-origin: bottom; }
+.tumulo__pilar { position: relative; z-index: 1; width: 46px; height: var(--h); display: grid; place-items: start center; padding-top: 12px;
+  background: linear-gradient(90deg, var(--granito-luz) 0%, var(--granito) 22%, var(--granito) 70%, var(--granito-sombra) 100%);
+  clip-path: polygon(10% 0, 90% 0, 100% 6px, 100% 100%, 0 100%, 0 6px);
+  box-shadow: inset 0 -10px 18px rgba(0, 0, 0, .25); transform-origin: 50% 100%; transition: filter .4s ease; }
+.tumulo__nome { writing-mode: vertical-rl; font-weight: 700; font-size: var(--fs); line-height: 1; letter-spacing: .02em; color: var(--ouro);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .55); white-space: nowrap; max-height: calc(var(--h) - 40px); overflow: hidden; }
+.tumulo__base { position: relative; z-index: 1; width: 70px; height: 12px; background: linear-gradient(180deg, var(--granito-luz), var(--granito)); }
+.tumulo__base2 { position: relative; z-index: 1; width: 96px; height: 18px; background: linear-gradient(180deg, var(--granito), var(--granito-sombra));
+  box-shadow: 0 8px 14px rgba(0, 0, 0, .4); }
+.tumulo__oferenda { position: absolute; z-index: 2; bottom: 30px; left: 50%; transform: translateX(-50%); width: 96px; height: 0; }
+.tumulo__oferenda::before, .tumulo__oferenda::after { content: ""; position: absolute; bottom: 0; width: 8px; height: 18px; background: var(--granito-sombra);
+  border-radius: 2px 2px 0 0; box-shadow: 0 -7px 0 -1px var(--musgo), -3px -11px 0 -2px #6f8f55, 3px -12px 0 -2px #6f8f55; }
+.tumulo__oferenda::before { left: 6px; } .tumulo__oferenda::after { right: 6px; }
+.tumulo__incenso { position: absolute; z-index: 2; bottom: 31px; left: 50%; transform: translateX(-50%); width: 24px; height: 8px; background: var(--granito-sombra); border-radius: 2px; }
+.tumulo__incenso i { position: absolute; bottom: 8px; width: 2px; height: 14px; background: #7b4f33; }
+.tumulo__incenso i:nth-child(1) { left: 8px; transform: rotate(-6deg); } .tumulo__incenso i:nth-child(2) { left: 13px; transform: rotate(5deg); }
+.tumulo__incenso i::after { content: ""; position: absolute; top: -2px; left: -1px; width: 4px; height: 4px; border-radius: 50%; background: #ff8a4a; box-shadow: 0 0 6px 2px rgba(255, 130, 60, .6); }
+.fumaca { position: absolute; z-index: 2; bottom: 52px; left: 50%; width: 30px; height: 90px; transform: translateX(-50%); overflow: visible; pointer-events: none; }
+.fumaca path { fill: none; stroke: #cdc6e6; stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 120; stroke-dashoffset: 120; opacity: 0; }
+
+.tumulo--esquecida .tumulo__pilar { background:
+  linear-gradient(0deg, rgba(93, 122, 69, .75) 0, rgba(93, 122, 69, 0) 38%),
+  linear-gradient(90deg, var(--granito-luz) 0%, var(--granito) 22%, var(--granito) 70%, var(--granito-sombra) 100%); }
+.tumulo--esquecida .tumulo__base, .tumulo--esquecida .tumulo__base2 { background: linear-gradient(180deg, #59704a, var(--granito-sombra)); }
+.tumulo--esquecida .tumulo__incenso i::after { background: #4b4036; box-shadow: none; }
+.tumulo--esquecida .tumulo__sotoba span { filter: brightness(.6) saturate(.6); }
+.tumulo--violenta .tumulo__pilar { transform: rotate(-3.2deg); }
+.tumulo--violenta .tumulo__sotoba span:first-child { transform: rotate(-9deg); transform-origin: bottom; }
+
+/* ---------- hitodama ---------- */
+.tumulo__chamas { position: absolute; z-index: 3; inset: 0 0 auto 0; height: 70px; pointer-events: none; }
+.hitodama { --cor: var(--chama-calma); position: absolute; display: inline-block; width: 13px; height: 28px; }
+.hitodama::before { content: ""; position: absolute; left: 0; bottom: 0; width: 13px; height: 13px; border-radius: 0 50% 50% 50%; transform: rotate(45deg);
+  background: radial-gradient(circle at 62% 62%, #fff 0 20%, var(--cor) 58%, color-mix(in srgb, var(--cor) 30%, transparent) 80%);
+  box-shadow: 0 0 16px 5px color-mix(in srgb, var(--cor) 42%, transparent); }
+.hitodama::after { content: ""; position: absolute; left: 4px; bottom: 9px; width: 5px; height: 19px; border-radius: 50% 50% 40% 40% / 90% 90% 10% 10%;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--cor) 85%, transparent), transparent); transform-origin: 50% 100%; transform: skewX(-14deg); }
+.tumulo__chamas .hitodama { top: 18px; left: 66%; }
+.tumulo__chamas .hitodama:nth-child(2) { top: 0; left: 22%; }
+.tumulo__chamas .hitodama:nth-child(3) { top: 34px; left: 8%; }
+.chamas-2 .hitodama { --cor: var(--chama-agitada); }
+.chamas-3 .hitodama { --cor: var(--chama-violenta); }
+
+.vivo .hitodama { animation: flutuar 5.2s ease-in-out infinite; }
+.vivo .hitodama:nth-child(2) { animation-duration: 6.1s; animation-delay: -2.2s; }
+.vivo .hitodama:nth-child(3) { animation-duration: 4.4s; animation-delay: -1.1s; }
+.vivo .chamas-2 .hitodama { animation-duration: 3.2s; }
+.vivo .chamas-3 .hitodama { animation: flutuar 2.6s ease-in-out infinite, tremor .18s steps(2, end) infinite; }
+.vivo:not(.tumulo--esquecida) .fumaca path { animation: subir 6s linear infinite; }
+.vivo:not(.tumulo--esquecida) .fumaca path:nth-child(2) { animation-delay: -3s; }
+
+/* ---------- yūrei ---------- */
+.yurei { position: absolute; z-index: 0; bottom: 40px; left: 50%; width: 84px; height: 132px; margin-left: -70px; pointer-events: none;
+  opacity: 0; transform: translateY(26px) scale(.94); filter: blur(5px);
+  transition: opacity .9s cubic-bezier(.16, 1, .3, 1), transform 1.2s cubic-bezier(.16, 1, .3, 1), filter .9s ease; }
+
+/* ---------- aproximar-se ---------- */
+.tumulo.ativo .tumulo__pilar, .tumulo:hover .tumulo__pilar { filter: brightness(1.18); }
+.tumulo.ativo .tumulo__nome { text-shadow: 0 1px 0 rgba(0, 0, 0, .55), 0 0 12px rgba(255, 220, 150, .35); }
+.tumulo.ativo:not(.tumulo--esquecida) .fumaca path { animation: subir 3.4s linear infinite; stroke: #e2dcf5; }
+.tumulo.ativo .yurei, .tumulo--violenta:hover .yurei { opacity: .92; transform: translateY(0) scale(1); filter: blur(0); }
+.tumulo.ativo .yurei { animation: pairar 4s ease-in-out 1.2s infinite; }
+
+/* ---------- névoa ---------- */
+.nevoa { position: fixed; left: -20vw; right: -20vw; bottom: 0; height: 38vh; z-index: 4; pointer-events: none; }
+.nevoa span { position: absolute; bottom: -12vh; width: 70vw; height: 30vh; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(190, 196, 235, .22), rgba(190, 196, 235, 0) 70%); animation: deriva 46s ease-in-out infinite alternate; }
+.nevoa span:nth-child(1) { left: 0; }
+.nevoa span:nth-child(2) { left: 40vw; bottom: -6vh; animation-duration: 62s; animation-delay: -20s; }
+.nevoa span:nth-child(3) { left: 80vw; animation-duration: 54s; animation-delay: -9s; }
+
+/* ---------- washi ---------- */
+.washi { position: fixed; z-index: 10; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(960px, calc(100% - 32px));
+  max-height: 48vh; overflow: auto; overscroll-behavior: contain;
+  background: linear-gradient(180deg, var(--washi), var(--washi-fundo)); color: var(--sumi); border-radius: 4px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .6), 0 2px 0 rgba(255, 255, 255, .5) inset;
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 22px; padding: 18px 24px 20px;
+  scrollbar-color: var(--madeira-sombra) transparent; }
+.washi ::selection { background: var(--shu); color: var(--washi); }
+.washi__fechar { all: unset; position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; display: grid; place-items: center;
+  border-radius: 4px; color: var(--sumi-suave); cursor: pointer; }
+.washi__fechar:hover { color: var(--shu); background: rgba(200, 64, 43, .08); }
+.washi__fechar:focus-visible { outline: 2px solid var(--shu); outline-offset: 1px; }
+.washi[data-vazio] .washi__fechar { display: none; }
+.washi__selo { grid-row: span 2; align-self: start; width: 52px; height: 52px; font-size: 1.15rem; margin-top: 4px; }
+.washi__selo:empty { background: transparent; box-shadow: inset 0 0 0 2px rgba(200, 64, 43, .5); }
+.washi h3 { margin: 0; padding-right: 36px; font-size: 1.25rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.washi__caminho { margin: 0; color: var(--sumi-suave); font-size: .85rem; overflow-wrap: anywhere; }
+.washi__corpo { grid-column: 2; display: grid; gap: 8px; }
+.washi__meta { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .9rem; color: var(--sumi-suave); font-variant-numeric: lining-nums; }
+.washi__meta b { color: var(--sumi); font-weight: 700; }
+.washi__epitafio { margin: 2px 0 0; font-size: clamp(1.05rem, 2.2vw, 1.2rem); line-height: 1.65; max-width: 68ch; min-height: 1.65em; }
+.washi__epitafio::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 3px; vertical-align: -2px; background: var(--shu); opacity: 0; }
+.washi.digitando .washi__epitafio::after { opacity: 1; animation: piscar .9s steps(1, end) infinite; }
+.washi__palavras { margin: 0; font-size: .92rem; color: var(--sumi-suave); }
+.washi__palavras q { color: var(--sumi); }
+.washi__motivos { margin: 0; font-size: .88rem; color: #8a2c1d; }
+.washi__motivos:empty { display: none; }
+.washi[data-vazio] .washi__meta, .washi[data-vazio] .washi__palavras { display: none; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.relatos { display: none; }
+
+footer { text-align: center; color: var(--texto-suave); font-size: .9rem; padding: 64px 16px 0; max-width: 60ch; margin: 0 auto; }
+
+/* ---------- movimento ---------- */
+@keyframes flutuar { 0%, 100% { translate: 0 0; } 50% { translate: 3px -11px; } }
+@keyframes tremor { 0% { margin-left: 0; } 50% { margin-left: 1.5px; } }
+@keyframes subir { 0% { stroke-dashoffset: 120; opacity: 0; } 15% { opacity: .55; } 100% { stroke-dashoffset: -120; opacity: 0; } }
+@keyframes pairar { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@keyframes deriva { from { transform: translateX(-8vw); } to { transform: translateX(8vw); } }
+@keyframes cintilar { 50% { opacity: .3; } }
+@keyframes balancar { 0%, 100% { rotate: -1.5deg; } 50% { rotate: 1.5deg; } }
+@keyframes tremeluzir { 0%, 100% { filter: brightness(1); } 23% { filter: brightness(.86); } 27% { filter: brightness(1.05); } 61% { filter: brightness(.93); } 64% { filter: brightness(1); } }
+@keyframes piscar { 50% { opacity: 0; } }
+
+@media (max-width: 640px) {
+  :root { --t-tumulo: .84; }
+  .fileira { gap: 24px 10px; justify-content: center; }
+  .tumulo { padding-top: 56px; }
+  .washi { gap: 4px 12px; padding: 14px 14px 16px; bottom: 10px; width: calc(100% - 20px); max-height: 52vh; }
+  .washi__selo { width: 36px; height: 36px; font-size: .85rem; margin-top: 2px; }
+  .washi h3 { font-size: 1.1rem; }
+  .washi[data-vazio] .washi__caminho { font-size: .82rem; }
+  .lua { top: 3vh; right: 3vw; width: 54px; }
+  .kanban__kanji { writing-mode: horizontal-tb; grid-column: 1 / -1; margin-bottom: 8px; }
+  .kanban { grid-template-columns: 1fr; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .tumulo.ativo .yurei { filter: none; }
+}
+|}</style>
 </head>
 <body>
-<header>
-  <h1>Kuyō 供養</h1>
-  <p>{almas.size} souls laid to rest from {repo}</p>
+
+<div class="ceu" aria-hidden="true">
+  <svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+    <g>
+      <circle class="estrela" cx="62" cy="48" r="1.3"/><circle class="estrela" cx="148" cy="122" r="1"/>
+      <circle class="estrela" cx="231" cy="34" r="1.6"/><circle class="estrela" cx="318" cy="96" r="1.1"/>
+      <circle class="estrela" cx="402" cy="22" r="1.2"/><circle class="estrela" cx="476" cy="140" r="1"/>
+      <circle class="estrela" cx="544" cy="64" r="1.5"/><circle class="estrela" cx="611" cy="16" r="1"/>
+      <circle class="estrela" cx="688" cy="110" r="1.3"/><circle class="estrela" cx="902" cy="190" r="1.2"/>
+      <circle class="estrela" cx="954" cy="58" r="1"/><circle class="estrela" cx="28" cy="210" r="1.1"/>
+      <circle class="estrela" cx="372" cy="200" r="1"/><circle class="estrela" cx="760" cy="230" r="1.1"/>
+      <circle class="estrela" cx="520" cy="250" r="1"/><circle class="estrela" cx="196" cy="268" r="1.2"/>
+    </g>
+  </svg>
+  <div class="lua"></div>
+  <svg class="colinas" viewBox="0 0 1000 200" preserveAspectRatio="none">
+    <path d="M0 120 C120 80 220 96 330 112 C450 128 540 70 660 78 C780 86 860 120 1000 96 V200 H0 Z" fill="#141a40"/>
+    <path d="M0 150 C140 128 260 150 400 142 C540 134 640 110 780 126 C880 138 940 150 1000 144 V200 H0 Z" fill="#10153a"/>
+  </svg>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="kimono" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f2ff"/>
+      <stop offset=".55" stop-color="#dcd8f2" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#c8c2ea" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="yurei" viewBox="0 0 84 132">
+      <path d="M44 34 C30 36 24 50 25 68 C26 86 32 102 40 132 C43 120 47 112 50 126 C55 108 62 90 61 70 C60 50 56 36 44 34 Z" fill="url(#kimono)"/>
+      <path d="M31 50 C22 54 14 60 6 66 C8 70 11 72 14 71 C20 66 27 62 35 60 Z" fill="url(#kimono)"/>
+      <path d="M8 66 C6 72 7 77 10 79 M12 70 C11 76 12 80 15 81" stroke="#e8e5f7" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M44 6 C31 6 26 17 27 30 C28 46 23 62 28 80 L34 60 C33 46 36 37 44 36 C52 37 55 46 54 60 L60 82 C64 62 59 46 60 30 C61 17 57 6 44 6 Z" fill="#14121c"/>
+      <ellipse cx="44" cy="24" rx="7.5" ry="10" fill="#e9e7f6"/>
+      <path d="M36 15 C38 22 38 30 36 38 M52 15 C50 22 50 30 52 38" stroke="#14121c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M39 13 L44 19 L49 13 Z" fill="#fbfaff"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="portal">
+  <div class="varal">
+    <div class="chochin" aria-hidden="true"><div class="chochin__corpo"></div></div>
+    <div class="kanban">
+      <span class="kanban__kanji" lang="ja" aria-hidden="true">供養</span>
+      <div>
+        <h1>Kuyō</h1>
+        <p class="kanban__repo">{c.repo}</p>
+        <p class="kanban__total"><b>{c.total}</b> {c.textos.almas}</p>
+      </div>
+    </div>
+    <div class="chochin" aria-hidden="true"><div class="chochin__corpo"></div></div>
+  </div>
+  <ul class="censo">
+    {#for s in c.censo}
+    <li><span class="selo" lang="ja" aria-hidden="true">{s.kanji}</span>{s.rotulo} <b>{s.quantidade}</b></li>
+    {/for}
+  </ul>
+  <p class="legenda" aria-hidden="true">
+    <span><i class="hitodama" style="--cor: var(--chama-calma)"></i> &lt; 0.3</span>
+    <span><i class="hitodama" style="--cor: var(--chama-agitada)"></i><i class="hitodama" style="--cor: var(--chama-agitada)"></i> 0.3–0.6</span>
+    <span><i class="hitodama" style="--cor: var(--chama-violenta)"></i><i class="hitodama" style="--cor: var(--chama-violenta)"></i><i class="hitodama" style="--cor: var(--chama-violenta)"></i> ≥ 0.6</span>
+  </p>
 </header>
+
 <main>
-{#for t in almas}
-  <article class="tumulo" data-chamas="{t.chamas}">
-    <h2 title="{t.caminho}">{t.nome}</h2>
-    <p class="datas">{t.nascimento} – {t.morte}</p>
-    <p class="causa">{t.causa} · {t.inquietacaoFormatada}</p>
-    {#if t.epitafio}<p class="epitafio">{t.epitafio}</p>{/if}
-  </article>
-{/for}
+  {#for terraco in c.terracos}
+  <section class="terraco" aria-labelledby="terraco-{terraco_index}">
+    <div class="marco">
+      <div class="toro" aria-hidden="true"><span class="toro__kasa"></span><span class="toro__luz"></span><span class="toro__haste"></span><span class="toro__pe"></span></div>
+      <h2 id="terraco-{terraco_index}">{terraco.rotulo}</h2>
+      <p>· {terraco.tumulos.size}</p>
+    </div>
+    <ol class="fileira">
+      {#for t in terraco.tumulos}
+      <li>
+        <button type="button" class="tumulo tumulo--{t.causa}" data-id="{t.id}" style="--h: {t.alturaPilar}px; --fs: {t.tamanhoNome}px"
+                aria-label="{t.nome}, {t.causaRotulo}" aria-describedby="r-{t.id}">
+          {#if t.violenta}<svg class="yurei" aria-hidden="true"><use href="#yurei"/></svg>{/if}
+          <span class="tumulo__sotoba" aria-hidden="true"><span></span><span></span></span>
+          <span class="tumulo__pilar" aria-hidden="true"><span class="tumulo__nome">{t.nome}</span></span>
+          <span class="tumulo__base" aria-hidden="true"></span>
+          <span class="tumulo__base2" aria-hidden="true"></span>
+          <span class="tumulo__oferenda" aria-hidden="true"></span>
+          <span class="tumulo__incenso" aria-hidden="true"><i></i><i></i></span>
+          <svg class="fumaca" viewBox="0 0 30 90" aria-hidden="true"><path d="M14 90 C8 72 20 60 13 44 C7 30 19 18 14 0"/><path d="M16 90 C22 74 10 62 17 46 C23 32 11 20 16 2"/></svg>
+          <span class="tumulo__chamas chamas-{t.chamas}" aria-hidden="true">{#for i in t.chamas}<span class="hitodama"></span>{/for}</span>
+        </button>
+      </li>
+      {/for}
+    </ol>
+    <div class="degrau" aria-hidden="true"></div>
+  </section>
+  {/for}
 </main>
+
+<footer><p>{c.textos.rodape}</p></footer>
+
+<div class="nevoa" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<aside class="washi" data-vazio aria-label="{c.textos.rotuloWashi}">
+  <button type="button" class="washi__fechar" aria-label="{c.textos.fechar}"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2 L12 12 M12 2 L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <span class="selo washi__selo" lang="ja" aria-hidden="true"></span>
+  <div class="washi__corpo">
+    <div>
+      <h3 class="washi__nome">{c.textos.convite}</h3>
+      <p class="washi__caminho">{c.textos.conviteDetalhe}</p>
+    </div>
+    <p class="washi__meta"></p>
+    <p class="washi__palavras"></p>
+    <p class="washi__epitafio" aria-hidden="true"></p>
+    <p class="washi__motivos"></p>
+    <p class="sr" aria-live="polite"></p>
+  </div>
+</aside>
+
+<div class="relatos">
+  {#for terraco in c.terracos}{#for t in terraco.tumulos}
+  <article id="r-{t.id}" data-causa="{t.causa}" data-kanji="{t.causaKanji}">
+    <h4 data-campo="nome">{t.nome}</h4>
+    <p data-campo="caminho">{t.caminho}</p>
+    <p data-campo="meta"><span><b>{t.causaRotulo}</b> · {c.textos.inquietacao} {t.inquietacao}</span> <span>{c.textos.viveu} {t.vida} · {t.nascimento} – {t.morte}</span> <span>{c.textos.morreuAs} {t.horaDaMorte}</span></p>
+    <p data-campo="palavras">{c.textos.ultimasPalavras}: <q>{t.ultimasPalavras}</q> · {t.hash}</p>
+    <p data-campo="epitafio">{#if t.epitafio}{t.epitafio}{#else}{c.textos.semEpitafio}{/if}</p>
+    <p data-campo="motivos">{#if t.motivos.isEmpty}{#else}{c.textos.porQue}: {#each t.motivos}{it}{#if it_hasNext} · {/if}{/each}{/if}</p>
+  </article>
+  {/for}{/for}
+</div>
+
+<script>{|
+(() => {
+  const washi = document.querySelector('.washi');
+  const campo = (nome) => washi.querySelector('.washi__' + nome);
+  const vivo = washi.querySelector('[aria-live]');
+  const calmo = matchMedia('(prefers-reduced-motion: reduce)');
+  let ativo = null;
+  let escrita = 0;
+
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--altura-washi', washi.offsetHeight + 'px');
+  }).observe(washi);
+
+  const visiveis = new IntersectionObserver((entradas) => {
+    for (const e of entradas) e.target.classList.toggle('vivo', e.isIntersecting);
+  }, { rootMargin: '120px 0px' });
+  document.querySelectorAll('.tumulo').forEach((t) => visiveis.observe(t));
+
+  function escrever(alvo, texto) {
+    const minha = ++escrita;
+    if (calmo.matches) { alvo.textContent = texto; washi.classList.remove('digitando'); return; }
+    alvo.textContent = '';
+    washi.classList.add('digitando');
+    let i = 0;
+    let antes = performance.now();
+    const passo = (agora) => {
+      if (minha !== escrita) return;
+      const n = Math.max(1, Math.floor((agora - antes) / 22));
+      if (agora - antes >= 22) {
+        i = Math.min(texto.length, i + n);
+        antes = agora;
+        alvo.textContent = texto.slice(0, i);
+      }
+      if (i < texto.length) requestAnimationFrame(passo);
+      else washi.classList.remove('digitando');
+    };
+    requestAnimationFrame(passo);
+  }
+
+  function aproximar(tumulo) {
+    if (tumulo === ativo) return;
+    ativo?.classList.remove('ativo');
+    ativo = tumulo;
+    tumulo.classList.add('ativo');
+    const relato = document.getElementById('r-' + tumulo.dataset.id);
+    const dado = (n) => relato.querySelector('[data-campo="' + n + '"]');
+    washi.removeAttribute('data-vazio');
+    const selo = washi.querySelector('.washi__selo');
+    selo.textContent = relato.dataset.kanji;
+    campo('nome').textContent = dado('nome').textContent;
+    campo('caminho').textContent = dado('caminho').textContent;
+    campo('meta').innerHTML = dado('meta').innerHTML;
+    campo('palavras').innerHTML = dado('palavras').innerHTML;
+    campo('motivos').textContent = dado('motivos').textContent.trim();
+    const epitafio = dado('epitafio').textContent.trim();
+    vivo.textContent = epitafio;
+    escrever(campo('epitafio'), epitafio);
+  }
+
+  const convite = [campo('nome').textContent, campo('caminho').textContent];
+  function afastar() {
+    if (!ativo) return;
+    const voltar = ativo;
+    ativo.classList.remove('ativo');
+    ativo = null;
+    ++escrita;
+    washi.classList.remove('digitando');
+    washi.setAttribute('data-vazio', '');
+    washi.querySelector('.washi__selo').textContent = '';
+    [campo('nome').textContent, campo('caminho').textContent] = convite;
+    for (const n of ['meta', 'palavras', 'epitafio', 'motivos']) campo(n).textContent = '';
+    vivo.textContent = '';
+    if (washi.contains(document.activeElement)) voltar.focus({ preventScroll: true });
+  }
+  washi.querySelector('.washi__fechar').addEventListener('click', afastar);
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') afastar(); });
+
+  document.querySelectorAll('.tumulo').forEach((t) => {
+    t.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') aproximar(t); });
+    t.addEventListener('focus', () => aproximar(t));
+    t.addEventListener('click', () => aproximar(t));
+  });
+})();
+|}</script>
 </body>
 </html>

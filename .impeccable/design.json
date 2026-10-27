@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-27T00:10:00-03:00",
+  "title": "Design System: Kuyō",
+  "extensions": {
+    "colorMeta": {
+      "noite": { "role": "neutral", "displayName": "Aizome Night" },
+      "granito": { "role": "neutral", "displayName": "Granite" },
+      "washi": { "role": "neutral", "displayName": "Washi Paper" },
+      "sumi": { "role": "neutral", "displayName": "Sumi Ink" },
+      "shu": { "role": "primary", "displayName": "Shu Vermilion" },
+      "lanterna": { "role": "secondary", "displayName": "Lantern Amber" },
+      "chama-calma": { "role": "tertiary", "displayName": "Calm Hitodama" },
+      "chama-agitada": { "role": "tertiary", "displayName": "Agitated Hitodama" },
+      "chama-violenta": { "role": "tertiary", "displayName": "Violent Hitodama" },
+      "ouro": { "role": "secondary", "displayName": "Gold Leaf Carving" }
+    },
+    "typographyMeta": {
+      "kanji": { "displayName": "Signboard Kanji", "purpose": "供養 on the kanban, vertical." },
+      "display": { "displayName": "Display", "purpose": "The Kuyō title only." },
+      "carving": { "displayName": "Carving", "purpose": "File names engraved vertically on pillars." },
+      "epitaph": { "displayName": "Epitaph", "purpose": "The epitaph on the washi strip." }
+    },
+    "shadows": [
+      { "name": "board", "value": "0 18px 40px rgba(0,0,0,.55)", "purpose": "Hanging signboard." },
+      { "name": "strip", "value": "0 18px 50px rgba(0,0,0,.6)", "purpose": "Washi reading strip." },
+      { "name": "stone", "value": "0 8px 14px rgba(0,0,0,.4)", "purpose": "Under grave bases." }
+    ],
+    "motion": [
+      { "name": "enter", "value": "cubic-bezier(.16, 1, .3, 1)", "purpose": "Yūrei rising, 0.9 to 1.2s." },
+      { "name": "float", "value": "5.2s ease-in-out infinite", "purpose": "Calm hitodama." },
+      { "name": "type", "value": "22ms per character", "purpose": "Epitaph brushed onto the washi strip." }
+    ],
+    "breakpoints": [ { "name": "mobile", "value": "640px" } ]
+  },
+  "components": [
+    {
+      "name": "Cause Seal",
+      "kind": "chip",
+      "refersTo": "seal",
+      "description": "Cause of death as a vermilion hanko seal.",
+      "html": "<span class=\"ds-selo\" lang=\"ja\">横死</span>",
+      "css": ".ds-selo { display: inline-grid; place-items: center; width: 30px; height: 30px; background: #c8402b; color: #f1e9d8; font: 700 .78rem/1 'Shippori Mincho B1', serif; border-radius: 4px; writing-mode: vertical-rl; box-shadow: 0 2px 6px rgba(0,0,0,.35); }"
+    },
+    {
+      "name": "Washi Strip",
+      "kind": "card",
+      "refersTo": "washi-strip",
+      "description": "Where a grave's story is read.",
+      "html": "<aside class=\"ds-washi\"><h3>rate-limit.ts</h3><p>Here rests src/lib/rate-limit.ts, which served diligently for six days.</p></aside>",
+      "css": ".ds-washi { background: linear-gradient(180deg, #f1e9d8, #e7dcc4); color: #231d19; border-radius: 4px; padding: 18px 24px 20px; box-shadow: 0 18px 50px rgba(0,0,0,.6); font-family: 'Shippori Mincho B1', serif; } .ds-washi h3 { margin: 0; font-weight: 700; font-size: 1.25rem; } .ds-washi p { margin: 8px 0 0; font-size: 1.15rem; line-height: 1.65; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "A night walk through a Japanese hakaba",
+    "overview": "Every deleted file has its own family grave. Facts become properties of the grave: pillar height is lifespan, flames are restlessness, tilt and the yūrei are violence, moss is neglect.",
+    "keyCharacteristics": ["Aizome indigo night", "Granite pillars with gold-leaf carving", "Vermilion seals and lanterns", "Hitodama from pale blue to violet", "Washi reading strip"],
+    "rules": [
+      { "name": "Light has a source", "body": "Glow only on moon, lanterns, embers and spirit flames.", "section": "colors" },
+      { "name": "Gold leaf carving", "body": "Pillar names filled with gold so they stay legible on granite.", "section": "colors" }
+    ],
+    "dos": ["Encode facts as properties of the grave.", "Keep everything hand-made and in one file."],
+    "donts": ["No western tombstones, crosses, pumpkins or bats.", "No cute yūrei.", "No glow without a light source."]
+  }
+}

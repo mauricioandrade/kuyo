@@ -1,56 +1,125 @@
 package dev.kuyo.cemiterio;
 
 import dev.kuyo.dominio.Alma;
+import dev.kuyo.dominio.CausaMortis;
 import dev.kuyo.dominio.Falecido;
 import dev.kuyo.dominio.Laudo;
 import io.quarkus.qute.TemplateData;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /** O que o template precisa saber de cada alma, já formatado. */
 @TemplateData
 public record Tumulo(
+        String id,
         String caminho,
         String nome,
         String causa,
-        double inquietacao,
+        String causaRotulo,
+        String causaKanji,
+        String inquietacao,
         int chamas,
+        boolean violenta,
+        boolean esquecida,
         String nascimento,
         String morte,
+        String vida,
         String horaDaMorte,
         String ultimasPalavras,
         String hash,
         String autores,
         String epitafio,
-        Laudo laudo) {
+        List<String> motivos,
+        int alturaPilar,
+        double tamanhoNome) {
 
-    private static final DateTimeFormatter DATA = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault());
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
+    private static final int PILAR_MIN = 96;
+    private static final int PILAR_MAX = 188;
 
-    public static Tumulo de(Alma alma) {
+    static Tumulo de(Alma alma, int indice, Textos t) {
         Falecido f = alma.falecido();
         var morte = f.commitDaMorte();
         String caminho = f.caminho();
+        String nome = caminho.substring(caminho.lastIndexOf('/') + 1);
+        Duration vida = Duration.between(f.nascimento(), f.morte());
+        String vidaTexto = t.vida(vida);
+        String hora = HORA.format(morte.quando());
+        int altura = alturaPilar(vida);
+        double inquietacao = alma.inquietacao();
+        ZoneId zona = morte.quando().getZone();
+
         return new Tumulo(
+                "t" + indice,
                 caminho,
-                caminho.substring(caminho.lastIndexOf('/') + 1),
+                nome,
                 alma.causa().name().toLowerCase(Locale.ROOT),
-                alma.inquietacao(),
-                alma.inquietacao() < 0.3 ? 1 : alma.inquietacao() < 0.6 ? 2 : 3,
-                DATA.format(f.nascimento()),
-                DATA.format(f.morte()),
-                HORA.format(morte.quando()),
+                t.causa(alma.causa()),
+                kanji(alma.causa()),
+                String.format(Locale.ROOT, "%.2f", inquietacao),
+                inquietacao < 0.3 ? 1 : inquietacao < 0.6 ? 2 : 3,
+                alma.causa() == CausaMortis.VIOLENTA,
+                alma.causa() == CausaMortis.ESQUECIDA,
+                t.data(f.nascimento().atZone(zona).toLocalDate()),
+                t.data(morte.quando().toLocalDate()),
+                vidaTexto,
+                hora,
                 primeiraLinha(morte.mensagem()),
                 morte.hash(),
                 String.join(", ", f.autores()),
                 alma.epitafio(),
-                alma.laudo());
+                motivos(alma.laudo(), morte.arquivosAlterados() - 1, hora, vidaTexto, t),
+                altura,
+                tamanhoNome(nome, altura));
     }
 
-    public String inquietacaoFormatada() {
-        return String.format(Locale.ROOT, "%.2f", inquietacao);
+    /** 横死 morte violenta · 夭折 morte prematura · 無縁 sem ninguém que cuide do túmulo · 天寿 a vida que coube. */
+    private static String kanji(CausaMortis causa) {
+        return switch (causa) {
+            case VIOLENTA -> "横死";
+            case PREMATURA -> "夭折";
+            case ESQUECIDA -> "無縁";
+            case NATURAL -> "天寿";
+        };
+    }
+
+    /** O pilar cresce com o log da vida: de minutos a um ano cabem entre 96 e 188 pixels. */
+    static int alturaPilar(Duration vida) {
+        double horas = Math.max(0, vida.toMinutes() / 60.0);
+        double fracao = Math.min(1, Math.log1p(horas) / Math.log1p(365 * 24));
+        return (int) Math.round(PILAR_MIN + fracao * (PILAR_MAX - PILAR_MIN));
+    }
+
+    /** O nome é entalhado na vertical; nomes longos encolhem para caber no pilar. */
+    static double tamanhoNome(String nome, int alturaPilar) {
+        double cabe = (alturaPilar - 24) / (nome.length() * 0.62);
+        return Math.round(Math.max(8.5, Math.min(17, cabe)) * 10) / 10.0;
+    }
+
+    /** O laudo em palavras: só os fatores que de fato pesaram. */
+    private static List<String> motivos(Laudo laudo, int companheiros, String hora, String vida, Textos t) {
+        List<String> motivos = new ArrayList<>();
+        if (laudo.tamanhoDoCommit() >= 0.5 && companheiros > 0) {
+            motivos.add(t.companheiros(companheiros));
+        }
+        if (laudo.horaDaMorte() > 0) {
+            motivos.add(t.hora(hora, laudo.horaDaMorte() >= 1));
+        }
+        if (laudo.mensagemSuspeita() > 0) {
+            motivos.add(t.palavrasSuspeitas());
+        }
+        if (laudo.semTestes() > 0) {
+            motivos.add(t.semTestes());
+        }
+        if (laudo.vidaCurta() >= 0.5) {
+            motivos.add(t.vidaCurta(vida));
+        }
+        return motivos;
     }
 
     private static String primeiraLinha(String mensagem) {

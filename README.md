@@ -30,7 +30,7 @@ Built for the DEV Hacktoberfest 2026 challenge, week 4: *Ghost in the Machine*.
 | Command | What it does | State |
 |---|---|---|
 | `kuyo scan <repo>` | Lists the dead and their cause of death, no LLM | ✅ working |
-| `kuyo bury <repo> [-o out]` | Writes epitaphs with Gemma and renders the cemetery | ✅ epitaphs · 🚧 haunted cemetery |
+| `kuyo bury <repo> [-o out]` | Writes epitaphs with Gemma and renders the cemetery | ✅ working |
 | `kuyo seance <repo> <file>` | Talk to a dead file | 💭 if time allows |
 
 ## 🚀 Getting started
@@ -71,7 +71,7 @@ The CLI output is in Portuguese for now.
 java -jar target/quarkus-app/quarkus-run.jar bury path/to/repo -o cemiterio.html
 ```
 
-Gemma writes one epitaph per soul, about a second each on a laptop GPU:
+Gemma writes one epitaph per soul, about a second each on a laptop GPU, and Kuyō renders a single self-contained `cemiterio.html`: a night walk through a Japanese cemetery, one terrace per month (or per day, when a month holds too many deaths). Pillar height is the file's lifespan, the flames are its restlessness, violent graves lean and raise a yūrei, forgotten ones grow moss. Approach a grave to read its epitaph.
 
 > Here rests SpikeResource.java, a brief experiment that lasted but nine hours. It met its end with the decree, "chore(web): remove phase 2 spike endpoint." May its ephemeral existence find quiet in the void.
 
@@ -132,6 +132,8 @@ Proprietary code can't be sent to a closed API. Kuyō runs entirely on your mach
 Java 25 · Quarkus (picocli) · JGit · LangChain4j + Ollama · Gemma · Qute
 
 Every visual, including the banner above, is drawn by hand in SVG and CSS. No downloaded images.
+
+The cemetery uses [Shippori Mincho B1](https://github.com/fontdasu/ShipporiMincho) by the Shippori Mincho Project Authors, under the [SIL Open Font License](src/main/resources/fonts/OFL.txt), embedded as small subsets so the page stays a single offline file.
 
 ## 📜 License
 

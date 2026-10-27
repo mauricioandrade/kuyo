@@ -50,3 +50,6 @@ nb-configuration.xml
 # saída do kuyo rodando na raiz do projeto
 /cemiterio.html
 /kuyo.json
+
+# capturas de revisão de design
+/.impeccable/review/
