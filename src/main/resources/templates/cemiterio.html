@@ -11,8 +11,8 @@
 @font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700latin')}) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700latinext')}) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 {! o Chrome agrupa faces por peso antes de combinar unicode-range: os kanji precisam de uma face em cada peso !}
-@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF; }
-@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF; }
+@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF, U+5E2B; }
+@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF, U+5E2B; }
 </style>
 <style>{|
 :root {
@@ -243,6 +243,10 @@ main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
 .washi__palavras q { color: var(--sumi); }
 .washi__motivos { margin: 0; font-size: .88rem; color: #8a2c1d; }
 .washi__motivos:empty { display: none; }
+.washi__autopsia { margin: 0; font-size: .88rem; color: var(--sumi-suave); }
+.washi__autopsia:empty { display: none; }
+.washi__autopsia b { color: var(--sumi); font-weight: 700; }
+.washi__autopsia [lang="ja"] { color: var(--shu); margin-right: 4px; }
 .washi[data-vazio] .washi__meta, .washi[data-vazio] .washi__palavras { display: none; }
 .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .relatos { display: none; }
@@ -394,6 +398,7 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     <p class="washi__palavras"></p>
     <p class="washi__epitafio" aria-hidden="true"></p>
     <p class="washi__motivos"></p>
+    <p class="washi__autopsia"></p>
     <p class="sr" aria-live="polite"></p>
   </div>
 </aside>
@@ -407,6 +412,7 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     <p data-campo="palavras">{c.textos.ultimasPalavras}: <q>{t.ultimasPalavras}</q> · {t.hash}</p>
     <p data-campo="epitafio">{#if t.epitafio}{t.epitafio}{#else}{c.textos.semEpitafio}{/if}</p>
     <p data-campo="motivos">{#if t.motivos.isEmpty}{#else}{c.textos.porQue}: {#each t.motivos}{it}{#if it_hasNext} · {/if}{/each}{/if}</p>
+    {#if t.autopsiado}<p data-campo="autopsia"><span lang="ja" aria-hidden="true">師</span><b>{c.textos.autopsia}:</b> {#if t.licoes.isEmpty}{c.textos.semLicoes}{#else}{#each t.licoes}{it}{#if it_hasNext}; {/if}{/each}{/if}</p>{/if}
   </article>
   {/for}{/for}
 </div>
@@ -465,6 +471,7 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     campo('meta').innerHTML = dado('meta').innerHTML;
     campo('palavras').innerHTML = dado('palavras').innerHTML;
     campo('motivos').textContent = dado('motivos').textContent.trim();
+    campo('autopsia').innerHTML = dado('autopsia')?.innerHTML ?? '';
     const epitafio = dado('epitafio').textContent.trim();
     vivo.textContent = epitafio;
     escrever(campo('epitafio'), epitafio);
@@ -481,7 +488,7 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     washi.setAttribute('data-vazio', '');
     washi.querySelector('.washi__selo').textContent = '';
     [campo('nome').textContent, campo('caminho').textContent] = convite;
-    for (const n of ['meta', 'palavras', 'epitafio', 'motivos']) campo(n).textContent = '';
+    for (const n of ['meta', 'palavras', 'epitafio', 'motivos', 'autopsia']) campo(n).textContent = '';
     vivo.textContent = '';
     if (washi.contains(document.activeElement)) voltar.focus({ preventScroll: true });
   }

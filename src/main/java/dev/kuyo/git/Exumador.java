@@ -1,5 +1,6 @@
 package dev.kuyo.git;
 
+import dev.kuyo.autopsia.ArquivoDeBuild;
 import dev.kuyo.dominio.CommitDaMorte;
 import dev.kuyo.dominio.Falecido;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -20,6 +21,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
+import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import java.io.File;
@@ -32,6 +34,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -122,6 +125,38 @@ public class Exumador {
             return mortos;
         }
     }
+
+    /**
+     * O pom.xml ou build.gradle mais próximo do morto, subindo de pasta em pasta, como estava no
+     * commit anterior à morte. Diz ao Shishō qual Java e qual framework o arquivo conheceu em vida.
+     */
+    public Optional<ArquivoDeBuild> arquivoDeBuild(Path caminhoRepo, Falecido f) throws IOException {
+        try (Repository repo = abrir(caminhoRepo); RevWalk walk = new RevWalk(repo)) {
+            ObjectId antes = repo.resolve(f.commitDaMorte().hash() + "^");
+            if (antes == null) {
+                return Optional.empty();
+            }
+            RevCommit commit = walk.parseCommit(antes);
+            String pasta = f.caminho().contains("/") ? f.caminho().substring(0, f.caminho().lastIndexOf('/')) : "";
+            while (true) {
+                for (String nome : BUILDS) {
+                    String caminho = pasta.isEmpty() ? nome : pasta + "/" + nome;
+                    try (TreeWalk tw = TreeWalk.forPath(repo, caminho, commit.getTree())) {
+                        if (tw != null) {
+                            byte[] bytes = repo.open(tw.getObjectId(0)).getCachedBytes(Integer.MAX_VALUE);
+                            return Optional.of(new ArquivoDeBuild(pasta, nome, new String(bytes, StandardCharsets.UTF_8)));
+                        }
+                    }
+                }
+                if (pasta.isEmpty()) {
+                    return Optional.empty();
+                }
+                pasta = pasta.contains("/") ? pasta.substring(0, pasta.lastIndexOf('/')) : "";
+            }
+        }
+    }
+
+    private static final List<String> BUILDS = List.of("pom.xml", "build.gradle", "build.gradle.kts");
 
     private static Repository abrir(Path caminhoRepo) throws IOException {
         File dir = caminhoRepo.toFile();

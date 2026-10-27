@@ -122,7 +122,7 @@ Full palette in named roles. The ground is aizome indigo, never black.
 
 ## Typography
 
-One family: Shippori Mincho B1 (SIL OFL), embedded as base64 subsets (Latin, Latin Extended, and only the kanji used: 供養 横死 夭折 無縁 天寿). Every kanji face is declared once per weight, because Chrome groups faces by weight before it combines `unicode-range`.
+One family: Shippori Mincho B1 (SIL OFL), embedded as base64 subsets (Latin, Latin Extended, and only the kanji used: 供養 横死 夭折 無縁 天寿, and 師 for the Shishō’s autopsy). Every kanji face is declared once per weight, because Chrome groups faces by weight before it combines `unicode-range`.
 
 ### Hierarchy
 - Kanji on the signboard: vertical, 700, up to 4.2rem.
@@ -167,7 +167,7 @@ Motion only runs on graves inside the viewport (IntersectionObserver adds `.vivo
 ### Do:
 - Encode facts as properties of the grave: height, tilt, moss, flames.
 - Keep every visual hand-made in CSS and SVG, and the page in one file.
-- Use the kanji subset only for the five words embedded; add glyphs to the font subset before using new ones.
+- Use the kanji subset only for the words embedded; add glyphs to the font subset before using new ones.
 
 ### Don't:
 - Don't use western tombstones, crosses, pumpkins, bats or blood.

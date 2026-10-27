@@ -89,6 +89,7 @@ Gemma writes one epitaph per soul, about a second each on my machine, and Kuyō 
 |---|---|
 | `--lang en\|pt` | language of the epitaphs (default `en`) |
 | `--sem-epitafios` | render the cemetery without calling the model |
+| `--autopsia` | ask the Shishō to examine every dead Java file (see below) |
 
 Epitaphs are cached in a `kuyo.json` next to the output, keyed by death commit, language and model, so reruns are instant. The model is configured at runtime, no rebuild needed:
 
@@ -96,6 +97,15 @@ Epitaphs are cached in a `kuyo.json` next to the output, keyed by death commit, 
 |---|---|
 | `KUYO_MODELO` | `gemma4:e4b` |
 | `KUYO_OLLAMA_URL` | `http://localhost:11434` |
+| `KUYO_SHISHO` | `shisho` (a command on the `PATH`, or the path to a `shisho.jar`) |
+
+### 師 Autopsy
+
+With `--autopsia`, every dead Java file goes on the table of [Shishō](https://github.com/mauricioandrade/shisho), my Java code reviewer. Kuyō writes the file's last contents to a temporary folder next to the `pom.xml` or `build.gradle` it lived with, runs `shisho analyze` on it, and carves on the grave only the lessons found in the dead file itself:
+
+> 師 **The Shishō's autopsy:** medium · No centralized error handling (line 21)
+
+When the Shishō finds nothing, the washi says so: *it died clean*. Like the restlessness score, the autopsy is deterministic. No model is involved.
 
 ### 🕯️ Séance
 

@@ -1,5 +1,6 @@
 package dev.kuyo.cli;
 
+import dev.kuyo.autopsia.Shisho;
 import dev.kuyo.cemiterio.Cemiterio;
 import dev.kuyo.cemiterio.Textos;
 import dev.kuyo.dominio.Alma;
@@ -38,8 +39,14 @@ public class BuryCommand implements Callable<Integer> {
     @Option(names = "--sem-epitafios", description = "Gera o cemitério sem chamar o modelo.")
     boolean semEpitafios;
 
+    @Option(names = "--autopsia", description = "Pede ao Shishō que examine o último conteúdo de cada arquivo Java morto.")
+    boolean autopsia;
+
     @Inject
     Exumador exumador;
+
+    @Inject
+    Shisho shisho;
 
     @Inject
     Legista legista;
@@ -63,6 +70,15 @@ public class BuryCommand implements Callable<Integer> {
         if (almas.isEmpty()) {
             System.out.println("Nenhum arquivo morto. Ninguém para velar.");
             return 0;
+        }
+
+        if (autopsia) {
+            Optional<String> problema = shisho.problema();
+            if (problema.isPresent()) {
+                System.err.println(problema.get());
+                return 1;
+            }
+            almas = autopsiar(almas);
         }
 
         Path pasta = saida.toAbsolutePath().getParent();
@@ -89,6 +105,20 @@ public class BuryCommand implements Callable<Integer> {
         Files.writeString(saida, html);
         System.out.printf("%n%d almas sepultadas em %s%n", almas.size(), saida.toAbsolutePath());
         return 0;
+    }
+
+    private List<Alma> autopsiar(List<Alma> almas) throws Exception {
+        List<Alma> examinadas = new ArrayList<>(almas.size());
+        for (Alma alma : almas) {
+            if (shisho.examina(alma.falecido())) {
+                System.out.printf("師 autópsia de %s%n", alma.falecido().caminho());
+                alma = shisho.examinar(alma.falecido(), exumador.arquivoDeBuild(repo, alma.falecido()), lingua)
+                        .map(alma::comAutopsia)
+                        .orElse(alma);
+            }
+            examinadas.add(alma);
+        }
+        return examinadas;
     }
 
     private List<Alma> escreverEpitafios(List<Alma> almas) throws Exception {

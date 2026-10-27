@@ -26,7 +26,9 @@ public record Textos(
         String semEpitafio,
         String rodape,
         String fechar,
-        String rotuloWashi) {
+        String rotuloWashi,
+        String autopsia,
+        String semLicoes) {
 
     private static final Textos EN = new Textos("en",
             "souls laid to rest",
@@ -35,7 +37,9 @@ public record Textos(
             "Lived", "Died at", "Last words", "Authors", "Restlessness", "Why it does not rest",
             "No epitaph was written. The monk was not called.",
             "Every file here served once. Kuyō, a memorial for objects that served well.",
-            "Close", "Epitaph");
+            "Close", "Epitaph",
+            "The Shishō's autopsy",
+            "The Shishō examined the body and found no fault. It died clean.");
 
     private static final Textos PT = new Textos("pt-BR",
             "almas sepultadas",
@@ -44,7 +48,9 @@ public record Textos(
             "Viveu", "Morreu às", "Últimas palavras", "Autores", "Inquietação", "Por que não descansa",
             "Nenhum epitáfio foi escrito. O monge não foi chamado.",
             "Todo arquivo aqui serviu um dia. Kuyō, o memorial para objetos que serviram bem.",
-            "Fechar", "Epitáfio");
+            "Fechar", "Epitáfio",
+            "Autópsia do Shishō",
+            "O Shishō examinou o corpo e não achou falha. Morreu limpo.");
 
     public static Textos de(Lingua lingua) {
         return lingua == Lingua.pt ? PT : EN;
@@ -117,5 +123,20 @@ public record Textos(
 
     String vidaCurta(String vida) {
         return lang.startsWith("pt") ? "viveu só " + vida : "lived only " + vida;
+    }
+
+    /** As gravidades do Shishō, que ele escreve sempre em português. */
+    String gravidade(String gravidade) {
+        boolean pt = lang.startsWith("pt");
+        return switch (gravidade) {
+            case "GRAVE" -> pt ? "grave" : "severe";
+            case "MEDIA" -> pt ? "média" : "medium";
+            case "LEVE" -> pt ? "leve" : "minor";
+            default -> pt ? "sugestão" : "suggestion";
+        };
+    }
+
+    String linha(int linha) {
+        return (lang.startsWith("pt") ? "linha " : "line ") + linha;
     }
 }

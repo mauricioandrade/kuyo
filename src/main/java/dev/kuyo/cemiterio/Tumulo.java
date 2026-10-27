@@ -4,6 +4,7 @@ import dev.kuyo.dominio.Alma;
 import dev.kuyo.dominio.CausaMortis;
 import dev.kuyo.dominio.Falecido;
 import dev.kuyo.dominio.Laudo;
+import dev.kuyo.dominio.Licao;
 import io.quarkus.qute.TemplateData;
 
 import java.time.Duration;
@@ -36,6 +37,8 @@ public record Tumulo(
         String autores,
         String epitafio,
         List<String> motivos,
+        boolean autopsiado,
+        List<String> licoes,
         int alturaPilar,
         double tamanhoNome,
         boolean duasColunas) {
@@ -77,6 +80,8 @@ public record Tumulo(
                 String.join(", ", f.autores()),
                 alma.epitafio(),
                 motivos(alma.laudo(), morte.arquivosAlterados() - 1, hora, vidaTexto, t),
+                alma.autopsia() != null,
+                alma.autopsia() == null ? List.of() : alma.autopsia().stream().map(l -> licao(l, t)).toList(),
                 altura,
                 tamanhoNome(nome, altura),
                 tamanhoNome(nome, altura) < LEGIVEL);
@@ -136,6 +141,10 @@ public record Tumulo(
             motivos.add(t.vidaCurta(vida));
         }
         return motivos;
+    }
+
+    private static String licao(Licao l, Textos t) {
+        return t.gravidade(l.gravidade()) + " · " + l.titulo() + (l.linha() > 0 ? " (" + t.linha(l.linha()) + ")" : "");
     }
 
     private static String primeiraLinha(String mensagem) {
