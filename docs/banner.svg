@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="t d">
+  <title id="t">Kuyō 供養</title>
+  <desc id="d">An engraved gravestone under a night sky, with a blue spirit flame floating beside it and incense smoke rising.</desc>
+  <defs>
+    <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d0b18"/>
+      <stop offset="1" stop-color="#1c1830"/>
+    </linearGradient>
+    <linearGradient id="pedra" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b5770"/>
+      <stop offset="1" stop-color="#36334a"/>
+    </linearGradient>
+    <radialGradient id="chama" cx="0.5" cy="0.65" r="0.6">
+      <stop offset="0" stop-color="#e8f4ff"/>
+      <stop offset="0.35" stop-color="#7cc4ff"/>
+      <stop offset="1" stop-color="#5b3fd6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7cc4ff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#7cc4ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lua" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#f3ecd2"/>
+      <stop offset="0.7" stop-color="#f3ecd2" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#f3ecd2" stop-opacity="0"/>
+    </radialGradient>
+    <style>
+      .hitodama { animation: flutuar 5s ease-in-out infinite; transform-origin: 300px 150px; }
+      .fumaca { stroke-dasharray: 260; animation: subir 7s linear infinite; }
+      .fumaca.b { animation-delay: -3.5s; }
+      .estrela { animation: piscar 4s ease-in-out infinite; }
+      .estrela:nth-child(2n) { animation-delay: -2s; }
+      @keyframes flutuar {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(6px, -14px); }
+      }
+      @keyframes subir {
+        from { stroke-dashoffset: 260; opacity: 0.6; }
+        to { stroke-dashoffset: -260; opacity: 0; }
+      }
+      @keyframes piscar { 50% { opacity: 0.25; } }
+      @media (prefers-reduced-motion: reduce) {
+        .hitodama, .fumaca, .estrela { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1200" height="360" rx="18" fill="url(#ceu)"/>
+
+  <g fill="#e9e4ff">
+    <circle class="estrela" cx="90" cy="60" r="1.6"/>
+    <circle class="estrela" cx="420" cy="40" r="1.2"/>
+    <circle class="estrela" cx="520" cy="95" r="1.8"/>
+    <circle class="estrela" cx="700" cy="30" r="1.3"/>
+    <circle class="estrela" cx="860" cy="70" r="1.6"/>
+    <circle class="estrela" cx="1010" cy="45" r="1.2"/>
+    <circle class="estrela" cx="1130" cy="110" r="1.5"/>
+    <circle class="estrela" cx="40" cy="170" r="1.1"/>
+  </g>
+  <circle cx="1090" cy="80" r="46" fill="url(#lua)"/>
+
+  <path d="M0 300 Q300 270 600 292 T1200 286 V360 H0 Z" fill="#110f1e"/>
+
+  <!-- lápide -->
+  <path d="M150 300 V140 Q150 92 200 92 Q250 92 250 140 V300 Z" fill="url(#pedra)"/>
+  <path d="M138 300 H262 V316 H138 Z" fill="#2a2740"/>
+  <rect x="178" y="128" width="44" height="140" rx="4" fill="#2c2940" opacity="0.7"/>
+  <g stroke="#a9a3c4" stroke-width="3" stroke-linecap="round">
+    <path d="M190 148 H210 M200 140 V160 M188 176 H212 M192 190 H208 M200 176 V206"/>
+    <path d="M190 226 H210 M196 218 V250 M204 218 V250 M190 250 H210"/>
+  </g>
+
+  <!-- incenso -->
+  <rect x="226" y="270" width="3" height="30" fill="#8a5a3c"/>
+  <circle cx="227.5" cy="270" r="2.4" fill="#ff8a4c"/>
+  <path class="fumaca" d="M227 268 C220 240 238 222 228 196 C220 176 236 160 230 136" fill="none"
+        stroke="#bdb6d6" stroke-width="2" stroke-linecap="round"/>
+  <path class="fumaca b" d="M228 268 C236 244 218 226 230 204 C240 184 222 168 228 146" fill="none"
+        stroke="#bdb6d6" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- hitodama -->
+  <g class="hitodama">
+    <circle cx="300" cy="150" r="48" fill="url(#halo)"/>
+    <path d="M300 190 A28 28 0 0 1 272 162 C272 140 290 128 296 108 C300 96 296 86 284 76
+             C306 82 318 102 316 122 C322 132 328 146 328 162 A28 28 0 0 1 300 190 Z" fill="url(#chama)"/>
+  </g>
+
+  <text x="420" y="180" font-family="Georgia,'Times New Roman',serif" font-size="96" fill="#f1edff"
+        letter-spacing="2">Kuyō</text>
+  <text x="424" y="232" font-family="Georgia,'Times New Roman',serif" font-size="30" fill="#b8b0dc"
+        font-style="italic">a funeral for the code that's gone</text>
+</svg>
