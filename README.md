@@ -25,6 +25,14 @@ In Japan, *kuyō* (供養) is a memorial service for objects that served well: n
 
 Built for the DEV Hacktoberfest 2026 challenge, week 4: *Ghost in the Machine*.
 
+<p align="center">
+  <img src="docs/demo.gif" alt="Walking the cemetery: approaching a violent grave raises a yūrei while its epitaph is brushed onto a washi strip" width="100%">
+</p>
+
+<p align="center"><a href="https://mauricioandrade.github.io/kuyo/cemiterio.html"><b>Walk the cemetery yourself →</b></a></p>
+
+> The demo cemetery comes from **stocklentes-hub, a private repository of mine**: 137 deleted files over five months. Its code stays private; only file names, dates, commit messages and the epitaphs Gemma wrote for them appear here. That is the point of Kuyō: the code never left my machine to produce this page.
+
 ## 🪦 Commands
 
 | Command | What it does | State |

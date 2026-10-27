@@ -25,6 +25,14 @@ No Japão, *kuyō* (供養) é a cerimônia de memorial para objetos que servira
 
 Feito para o desafio DEV Hacktoberfest 2026, semana 4: *Ghost in the Machine*.
 
+<p align="center">
+  <img src="docs/demo.gif" alt="Caminhando pelo cemitério: ao se aproximar de um túmulo violento, um yūrei surge enquanto o epitáfio é escrito na faixa de washi" width="100%">
+</p>
+
+<p align="center"><a href="https://mauricioandrade.github.io/kuyo/cemiterio.html"><b>Caminhe pelo cemitério →</b></a></p>
+
+> O cemitério do demo vem do **stocklentes-hub, um repositório privado meu**: 137 arquivos apagados em cinco meses. O código continua privado; aqui aparecem só nomes de arquivo, datas, mensagens de commit e os epitáfios que o Gemma escreveu para eles. É esse o ponto do Kuyō: o código nunca saiu da minha máquina para gerar esta página.
+
 ## 🪦 Comandos
 
 | Comando | O que faz | Estado |
