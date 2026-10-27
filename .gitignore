@@ -48,5 +48,5 @@ nb-configuration.xml
 *:Zone.Identifier
 
 # saída do kuyo rodando na raiz do projeto
-cemiterio.html
-kuyo.json
+/cemiterio.html
+/kuyo.json
