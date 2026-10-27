@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <title>Kuyō 供養 · {c.repo}</title>
+<script>document.documentElement.classList.add('js');</script>
 <style>
 @font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f400latin')}) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fontes.get('f400latinext')}) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
@@ -62,9 +63,10 @@ body {
 .ceu { position: fixed; inset: 0; z-index: -2; pointer-events: none;
   background: linear-gradient(180deg, var(--noite-alta) 0%, var(--noite) 45%, var(--horizonte) 100%); }
 .ceu svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.estrela { fill: #e6e1ff; animation: cintilar 5s ease-in-out infinite; }
-.estrela:nth-child(3n) { animation-delay: -1.7s; animation-duration: 7s; }
-.estrela:nth-child(4n) { animation-delay: -3.1s; }
+.estrela { fill: #e6e1ff; }
+.estrelas { animation: cintilar 5s ease-in-out infinite; }
+.estrelas:nth-of-type(2) { animation-duration: 7s; animation-delay: -1.7s; }
+.estrelas:nth-of-type(3) { animation-duration: 6s; animation-delay: -3.1s; }
 .lua { position: absolute; top: 7vh; right: 9vw; width: clamp(64px, 9vw, 120px); aspect-ratio: 1; border-radius: 50%;
   background: radial-gradient(circle at 40% 38%, #fbf5df 0 45%, #e9dfbd 70%, #d7caa1 100%);
   box-shadow: 0 0 60px 18px rgba(240, 230, 190, .16), 0 0 160px 60px rgba(240, 230, 190, .06); }
@@ -110,7 +112,7 @@ body {
 
 /* ---------- terraços ---------- */
 main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
-.terraco { position: relative; margin-top: 46px; }
+.terraco { position: relative; margin-top: 46px; content-visibility: auto; contain-intrinsic-size: auto 420px; }
 .marco { display: flex; align-items: flex-end; gap: 14px; margin: 0 0 -6px 4px; position: relative; z-index: 1; }
 .marco h2 { margin: 0 0 6px; font-size: clamp(1.15rem, 2.6vw, 1.45rem); font-weight: 700; letter-spacing: .01em; }
 .marco p { margin: 0 0 8px; color: var(--texto-suave); font-size: .9rem; font-variant-numeric: lining-nums; }
@@ -157,8 +159,10 @@ main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
 .tumulo__incenso i { position: absolute; bottom: 8px; width: 2px; height: 14px; background: #7b4f33; }
 .tumulo__incenso i:nth-child(1) { left: 8px; transform: rotate(-6deg); } .tumulo__incenso i:nth-child(2) { left: 13px; transform: rotate(5deg); }
 .tumulo__incenso i::after { content: ""; position: absolute; top: -2px; left: -1px; width: 4px; height: 4px; border-radius: 50%; background: #ff8a4a; box-shadow: 0 0 6px 2px rgba(255, 130, 60, .6); }
-.fumaca { position: absolute; z-index: 2; bottom: 52px; left: 50%; width: 30px; height: 90px; transform: translateX(-50%); overflow: visible; pointer-events: none; }
-.fumaca path { fill: none; stroke: #d6d0ee; stroke-width: 1.7; stroke-linecap: round; stroke-dasharray: 120; stroke-dashoffset: 120; opacity: 0; }
+.fumaca { position: absolute; z-index: 2; bottom: 50px; left: 50%; width: 30px; height: 90px; margin-left: -15px; pointer-events: none; }
+.fumaca svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(0deg, #000 35%, transparent 95%); mask-image: linear-gradient(0deg, #000 35%, transparent 95%); }
+.fumaca path { fill: none; stroke: #d6d0ee; stroke-width: 1.6; stroke-linecap: round; }
 
 .jizo { position: absolute; z-index: 2; bottom: 0; left: -13px; width: 16px; height: 30px; }
 .jizo::before { content: ""; position: absolute; left: 4px; top: 0; width: 9px; height: 9px; border-radius: 50%; background: var(--granito-luz); }
@@ -186,15 +190,24 @@ main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
 .tumulo__chamas .hitodama:nth-child(2) { top: 0; left: 22%; }
 .tumulo__chamas .hitodama:nth-child(3) { top: 34px; left: 8%; }
 .chamas-2 .hitodama { --cor: var(--chama-agitada); }
+.tumulo__chamas .hitodama { transition: scale .5s cubic-bezier(.16, 1, .3, 1), opacity .5s ease; }
 .chamas-3 .hitodama { --cor: var(--chama-violenta); }
 
 .vivo .hitodama { animation: flutuar 5.2s ease-in-out infinite; }
 .vivo .hitodama:nth-child(2) { animation-duration: 6.1s; animation-delay: -2.2s; }
 .vivo .hitodama:nth-child(3) { animation-duration: 4.4s; animation-delay: -1.1s; }
 .vivo .chamas-2 .hitodama { animation-duration: 3.2s; }
-.vivo .chamas-3 .hitodama { animation: flutuar 2.6s ease-in-out infinite, tremor .18s steps(2, end) infinite; }
-.vivo:not(.tumulo--esquecida) .fumaca path { animation: subir 6s linear infinite; }
-.vivo:not(.tumulo--esquecida) .fumaca path:nth-child(2) { animation-delay: -3s; }
+.vivo .chamas-3 .hitodama { animation-duration: 2.6s; }
+.vivo .chamas-3 { animation: tremor .18s steps(2, end) infinite; }
+.vivo:not(.tumulo--esquecida) .fumaca svg { animation: subir 6s cubic-bezier(.3, .1, .4, 1) infinite; }
+.vivo:not(.tumulo--esquecida) .fumaca svg:nth-child(2) { animation-delay: -3s; }
+
+/* as hitodama se acendem uma a uma na primeira vez que o terraço aparece */
+@media (prefers-reduced-motion: no-preference) {
+  .js .terraco:not(.aceso) .tumulo__chamas .hitodama { opacity: 0; scale: .3; }
+  .js .terraco .tumulo__chamas .hitodama { transition-delay: calc(min(var(--i, 0) * 70ms, 900ms) + 120ms); }
+  .js .terraco .tumulo.ativo .tumulo__chamas .hitodama, .js .terraco .tumulo:hover .tumulo__chamas .hitodama { transition-delay: 0s; }
+}
 
 /* ---------- yūrei ---------- */
 .yurei { position: absolute; z-index: 0; bottom: 40px; left: 50%; width: 84px; height: 132px; margin-left: -70px; pointer-events: none;
@@ -204,7 +217,11 @@ main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
 /* ---------- aproximar-se ---------- */
 .tumulo.ativo .tumulo__pilar, .tumulo:hover .tumulo__pilar { filter: brightness(1.18); }
 .tumulo.ativo .tumulo__nome { text-shadow: 0 1px 0 rgba(0, 0, 0, .55), 0 0 12px rgba(255, 220, 150, .35); }
-.tumulo.ativo:not(.tumulo--esquecida) .fumaca path { animation: subir 3.4s linear infinite; stroke: #e2dcf5; }
+.tumulo.ativo:not(.tumulo--esquecida) .fumaca svg { animation-duration: 3.4s; }
+.tumulo.ativo:not(.tumulo--esquecida) .fumaca path { stroke: #e9e4fa; }
+.tumulo__incenso i::after { transition: scale .35s cubic-bezier(.16, 1, .3, 1); }
+.tumulo.ativo:not(.tumulo--esquecida) .tumulo__incenso i::after { scale: 1.7; }
+.tumulo.ativo .tumulo__chamas .hitodama { scale: 1.15; }
 .tumulo.ativo .yurei, .tumulo--violenta:hover .yurei { opacity: .92; transform: translateY(0) scale(1); filter: blur(0); }
 .tumulo.ativo .yurei { animation: pairar 4s ease-in-out 1.2s infinite; }
 
@@ -233,10 +250,10 @@ main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
 .washi__selo:empty { background: transparent; box-shadow: inset 0 0 0 2px rgba(200, 64, 43, .5); }
 .washi h3 { margin: 0; padding-right: 36px; font-size: 1.25rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
 .washi__caminho { margin: 0; color: var(--sumi-suave); font-size: .85rem; overflow-wrap: anywhere; }
-.washi__corpo { grid-column: 2; display: grid; gap: 8px; }
+.washi__corpo { grid-column: 2; display: grid; gap: 8px; min-width: 0; }
 .washi__meta { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .9rem; color: var(--sumi-suave); font-variant-numeric: lining-nums; }
 .washi__meta b { color: var(--sumi); font-weight: 700; }
-.washi__epitafio { margin: 2px 0 0; font-size: clamp(1.05rem, 2.2vw, 1.2rem); line-height: 1.65; max-width: 68ch; min-height: 1.65em; }
+.washi__epitafio { overflow-wrap: anywhere; margin: 2px 0 0; font-size: clamp(1.05rem, 2.2vw, 1.2rem); line-height: 1.65; max-width: 68ch; min-height: 1.65em; }
 .washi__epitafio::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 3px; vertical-align: -2px; background: var(--shu); opacity: 0; }
 .washi.digitando .washi__epitafio::after { opacity: 1; animation: piscar .9s steps(1, end) infinite; }
 .washi__palavras { margin: 0; font-size: .92rem; color: var(--sumi-suave); }
@@ -248,6 +265,15 @@ main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
 .washi__autopsia b { color: var(--sumi); font-weight: 700; }
 .washi__autopsia [lang="ja"] { color: var(--shu); margin-right: 4px; }
 .washi[data-vazio] .washi__meta, .washi[data-vazio] .washi__palavras { display: none; }
+.som { position: fixed; z-index: 11; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 12px 7px 10px; border: 1px solid var(--chao-borda); border-radius: 4px; background: rgba(7, 9, 32, .72);
+  color: var(--texto-suave); font: inherit; font-size: .85rem; cursor: pointer; transition: color .2s ease, border-color .2s ease; }
+.som:hover { color: var(--texto); border-color: var(--granito-luz); }
+.som svg { width: 18px; height: 18px; flex: none; }
+.som .som__onda { opacity: 0; transition: opacity .25s ease; }
+.som[aria-pressed="true"] { color: var(--texto); border-color: var(--lanterna); }
+.som[aria-pressed="true"] .som__onda { opacity: 1; }
+.som[aria-pressed="true"] .som__corte { opacity: 0; }
 .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .relatos { display: none; }
 
@@ -255,8 +281,13 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
 
 /* ---------- movimento ---------- */
 @keyframes flutuar { 0%, 100% { translate: 0 0; } 50% { translate: 3px -11px; } }
-@keyframes tremor { 0% { margin-left: 0; } 50% { margin-left: 1.5px; } }
-@keyframes subir { 0% { stroke-dashoffset: 120; opacity: 0; } 18% { opacity: .8; } 100% { stroke-dashoffset: -120; opacity: 0; } }
+@keyframes tremor { 0% { transform: translateX(0); } 50% { transform: translateX(1.5px); } }
+@keyframes subir {
+  0% { opacity: 0; transform: translate(0, 18px) scale(.7, .5); }
+  22% { opacity: .75; }
+  60% { opacity: .5; transform: translate(2px, -8px) scale(1, 1.05); }
+  100% { opacity: 0; transform: translate(-3px, -30px) scale(1.25, 1.2); }
+}
 @keyframes pairar { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
 @keyframes deriva { from { transform: translateX(-8vw); } to { transform: translateX(8vw); } }
 @keyframes cintilar { 50% { opacity: .3; } }
@@ -273,6 +304,8 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
   .washi h3 { font-size: 1.1rem; }
   .washi[data-vazio] .washi__caminho { font-size: .82rem; }
   .lua { top: 128px; right: 12px; width: 40px; }
+  .som { top: 10px; left: 10px; padding: 8px; }
+  .som span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .kanban__kanji { writing-mode: horizontal-tb; grid-column: 1 / -1; margin-bottom: 8px; }
   .kanban { grid-template-columns: 1fr; text-align: center; }
 }
@@ -285,19 +318,19 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
 </head>
 <body>
 
-<div class="ceu" aria-hidden="true">
-  <svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
-    <g>
-      <circle class="estrela" cx="62" cy="48" r="1.3"/><circle class="estrela" cx="148" cy="122" r="1"/>
-      <circle class="estrela" cx="231" cy="34" r="1.6"/><circle class="estrela" cx="318" cy="96" r="1.1"/>
-      <circle class="estrela" cx="402" cy="22" r="1.2"/><circle class="estrela" cx="476" cy="140" r="1"/>
-      <circle class="estrela" cx="544" cy="64" r="1.5"/><circle class="estrela" cx="611" cy="16" r="1"/>
-      <circle class="estrela" cx="688" cy="110" r="1.3"/><circle class="estrela" cx="902" cy="190" r="1.2"/>
-      <circle class="estrela" cx="954" cy="58" r="1"/><circle class="estrela" cx="28" cy="210" r="1.1"/>
-      <circle class="estrela" cx="372" cy="200" r="1"/><circle class="estrela" cx="760" cy="230" r="1.1"/>
-      <circle class="estrela" cx="520" cy="250" r="1"/><circle class="estrela" cx="196" cy="268" r="1.2"/>
-    </g>
+<button type="button" class="som" aria-pressed="false" title="{c.textos.som}">
+  <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.5 7 H5.5 L9.5 3.5 V14.5 L5.5 11 H2.5 Z" fill="currentColor" fill-opacity=".18"/>
+    <path class="som__onda" d="M12 6.5 C13.2 7.6 13.2 10.4 12 11.5 M14.2 4.6 C16.4 6.8 16.4 11.2 14.2 13.4"/>
+    <path class="som__corte" d="M12.5 7 L16 10.5 M16 7 L12.5 10.5"/>
   </svg>
+  <span>{c.textos.som}</span>
+</button>
+
+<div class="ceu" aria-hidden="true">
+  <svg class="estrelas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><circle class="estrela" cx="62" cy="48" r="1.3"/><circle class="estrela" cx="318" cy="96" r="1.1"/><circle class="estrela" cx="544" cy="64" r="1.5"/><circle class="estrela" cx="902" cy="190" r="1.2"/><circle class="estrela" cx="372" cy="200" r="1"/><circle class="estrela" cx="196" cy="268" r="1.2"/></svg>
+  <svg class="estrelas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><circle class="estrela" cx="148" cy="122" r="1"/><circle class="estrela" cx="402" cy="22" r="1.2"/><circle class="estrela" cx="611" cy="16" r="1"/><circle class="estrela" cx="954" cy="58" r="1"/><circle class="estrela" cx="760" cy="230" r="1.1"/></svg>
+  <svg class="estrelas" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><circle class="estrela" cx="231" cy="34" r="1.6"/><circle class="estrela" cx="476" cy="140" r="1"/><circle class="estrela" cx="688" cy="110" r="1.3"/><circle class="estrela" cx="28" cy="210" r="1.1"/><circle class="estrela" cx="520" cy="250" r="1"/></svg>
   <div class="lua"></div>
   <svg class="colinas" viewBox="0 0 1000 200" preserveAspectRatio="none">
     <path d="M0 120 C120 80 220 96 330 112 C450 128 540 70 660 78 C780 86 860 120 1000 96 V200 H0 Z" fill="#141a40"/>
@@ -361,7 +394,7 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     <ol class="fileira">
       {#for t in terraco.tumulos}
       <li>
-        <button type="button" class="tumulo tumulo--{t.causa}" data-id="{t.id}" style="--h: {t.alturaPilar}px; --fs: {t.tamanhoNome}px"
+        <button type="button" class="tumulo tumulo--{t.causa}" data-id="{t.id}" style="--h: {t.alturaPilar}px; --fs: {t.tamanhoNome}px; --i: {t_index}"
                 aria-label="{t.nome}, {t.causaRotulo}" aria-describedby="r-{t.id}">
           {#if t.violenta}<svg class="yurei" aria-hidden="true"><use href="#yurei"/></svg>{/if}
           <span class="tumulo__sotoba" aria-hidden="true"><span></span><span></span></span>
@@ -371,7 +404,7 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
           <span class="tumulo__oferenda" aria-hidden="true"></span>
           {#if t.prematura}<span class="jizo" aria-hidden="true"></span>{/if}
           <span class="tumulo__incenso" aria-hidden="true"><i></i><i></i></span>
-          <svg class="fumaca" viewBox="0 0 30 90" aria-hidden="true"><path d="M14 90 C8 72 20 60 13 44 C7 30 19 18 14 0"/><path d="M16 90 C22 74 10 62 17 46 C23 32 11 20 16 2"/></svg>
+          <span class="fumaca" aria-hidden="true"><svg viewBox="0 0 30 90"><path d="M14 90 C8 72 20 60 13 44 C7 30 19 18 14 0"/></svg><svg viewBox="0 0 30 90"><path d="M16 90 C22 74 10 62 17 46 C23 32 11 20 16 2"/></svg></span>
           <span class="tumulo__chamas chamas-{t.chamas}" aria-hidden="true">{#for i in t.chamas}<span class="hitodama"></span>{/for}</span>
         </button>
       </li>
@@ -442,6 +475,16 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
   }, { rootMargin: '120px 0px' });
   document.querySelectorAll('.tumulo').forEach((t) => visiveis.observe(t));
 
+  // a primeira vez que um terraço aparece, as hitodama dele se acendem uma a uma
+  const acender = new IntersectionObserver((entradas) => {
+    for (const e of entradas) {
+      if (!e.isIntersecting) continue;
+      e.target.classList.add('aceso');
+      acender.unobserve(e.target);
+    }
+  }, { rootMargin: '0px 0px -12% 0px' });
+  document.querySelectorAll('.terraco').forEach((t) => acender.observe(t));
+
   function escrever(alvo, texto) {
     const minha = ++escrita;
     if (calmo.matches) { alvo.textContent = texto; washi.classList.remove('digitando'); return; }
@@ -473,6 +516,14 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     washi.removeAttribute('data-vazio');
     const selo = washi.querySelector('.washi__selo');
     selo.textContent = relato.dataset.kanji;
+    // o selo é carimbado no washi, como um hanko
+    selo.animate(calmo.matches
+      ? [{ opacity: 0 }, { opacity: 1 }]
+      : [{ opacity: 0, transform: 'scale(1.45) rotate(-8deg)' }, { opacity: 1, offset: .55, transform: 'scale(.94) rotate(1deg)' }, { opacity: 1, transform: 'scale(1) rotate(0)' }],
+      { duration: calmo.matches ? 160 : 420, easing: 'cubic-bezier(.16, 1, .3, 1)' });
+    campo('nome').parentElement.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }],
+      { duration: calmo.matches ? 1 : 260, easing: 'cubic-bezier(.16, 1, .3, 1)' });
+    som.orin(relato.dataset.causa);
     campo('nome').textContent = dado('nome').textContent;
     campo('caminho').textContent = dado('caminho').textContent;
     campo('meta').innerHTML = dado('meta').innerHTML;
@@ -504,6 +555,112 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     }
   }
   washi.querySelector('.washi__fechar').addEventListener('click', afastar);
+
+  // ---------- som ----------
+  // Tudo é sintetizado: nenhum arquivo de áudio, a página continua sendo um arquivo só.
+  // Desligado por padrão; só começa depois que o visitante pede.
+  const som = (() => {
+    const botao = document.querySelector('.som');
+    let ctx = null, mestre = null, ligado = false, grilos = 0;
+
+    function ruido(segundos) {
+      const b = ctx.createBuffer(1, ctx.sampleRate * segundos, ctx.sampleRate);
+      const d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      return b;
+    }
+
+    function preparar() {
+      ctx = new AudioContext();
+      mestre = ctx.createGain();
+      mestre.gain.value = 0;
+      mestre.connect(ctx.destination);
+
+      // vento: ruído num passa-faixa grave, respirando devagar
+      const vento = ctx.createBufferSource();
+      vento.buffer = ruido(4);
+      vento.loop = true;
+      const filtro = ctx.createBiquadFilter();
+      filtro.type = 'bandpass'; filtro.frequency.value = 380; filtro.Q.value = .6;
+      const volume = ctx.createGain(); volume.gain.value = .05;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = .07;
+      const profundidade = ctx.createGain(); profundidade.gain.value = .035;
+      lfo.connect(profundidade).connect(volume.gain);
+      const lfo2 = ctx.createOscillator(); lfo2.frequency.value = .031;
+      const varrer = ctx.createGain(); varrer.gain.value = 140;
+      lfo2.connect(varrer).connect(filtro.frequency);
+      vento.connect(filtro).connect(volume).connect(mestre);
+      vento.start(); lfo.start(); lfo2.start();
+    }
+
+    // suzumushi, o grilo-sino das noites de outono: trinados curtos e agudos, de lugares diferentes
+    function grilo() {
+      if (!ligado) return;
+      const agora = ctx.currentTime;
+      const pan = ctx.createStereoPanner(); pan.pan.value = Math.random() * 1.6 - .8;
+      pan.connect(mestre);
+      const freq = 4300 + Math.random() * 500;
+      const pulsos = 3 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < pulsos; i++) {
+        const t0 = agora + i * .085;
+        const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t0);
+        g.gain.linearRampToValueAtTime(.012, t0 + .012);
+        g.gain.exponentialRampToValueAtTime(.0001, t0 + .07);
+        o.connect(g).connect(pan); o.start(t0); o.stop(t0 + .08);
+      }
+      grilos = setTimeout(grilo, 900 + Math.random() * 2600);
+    }
+
+    // orin, o sino dos ritos budistas: parciais inarmônicos com caudas longas.
+    // Cada causa tem seu tom; a morte violenta soa com dois sinos quase afinados que batem entre si.
+    const tons = { natural: 587, prematura: 784, esquecida: 466, violenta: 415 };
+    function orin(causa) {
+      if (!ligado) return;
+      const agora = ctx.currentTime + .01;
+      const base = tons[causa] ?? 587;
+      const parciais = [[1, .11, 5.5], [2.76, .05, 3.2], [5.4, .025, 1.8], [8.93, .012, 1]];
+      const desafinos = causa === 'violenta' ? [0, 3.1] : [0];
+      const suave = causa === 'esquecida' ? .55 : 1;
+      for (const d of desafinos) {
+        for (const [razao, amp, cauda] of parciais) {
+          const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = base * razao + d;
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0, agora);
+          g.gain.linearRampToValueAtTime(amp * suave / desafinos.length, agora + .006);
+          g.gain.exponentialRampToValueAtTime(.0001, agora + cauda);
+          o.connect(g).connect(mestre); o.start(agora); o.stop(agora + cauda + .05);
+        }
+      }
+    }
+
+    function alternar() {
+      ligado = !ligado;
+      botao.setAttribute('aria-pressed', String(ligado));
+      if (ligado) {
+        if (!ctx) preparar();
+        ctx.resume();
+        mestre.gain.cancelScheduledValues(ctx.currentTime);
+        mestre.gain.setTargetAtTime(1, ctx.currentTime, .6);
+        clearTimeout(grilos); grilo();
+      } else if (ctx) {
+        clearTimeout(grilos);
+        mestre.gain.cancelScheduledValues(ctx.currentTime);
+        mestre.gain.setTargetAtTime(0, ctx.currentTime, .15);
+      }
+    }
+    botao.addEventListener('click', alternar);
+
+    // nada toca numa aba escondida
+    document.addEventListener('visibilitychange', () => {
+      if (!ctx || !ligado) return;
+      if (document.hidden) { clearTimeout(grilos); ctx.suspend(); }
+      else { ctx.resume(); grilo(); }
+    });
+
+    return { orin };
+  })();
   addEventListener('keydown', (e) => { if (e.key === 'Escape') afastar(); });
 
   document.querySelectorAll('.tumulo').forEach((t) => {

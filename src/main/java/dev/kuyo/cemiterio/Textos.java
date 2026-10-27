@@ -30,7 +30,8 @@ public record Textos(
         String autopsia,
         String semLicoes,
         String vazio,
-        String vazioDetalhe) {
+        String vazioDetalhe,
+        String som) {
 
     private static final Textos EN = new Textos("en",
             "souls laid to rest",
@@ -43,7 +44,8 @@ public record Textos(
             "The Shishō's autopsy",
             "The Shishō examined the body and found no fault. It died clean.",
             "No file has died here yet.",
-            "Every file in this repository is still alive. Come back after the next refactor.");
+            "Every file in this repository is still alive. Come back after the next refactor.",
+            "Sound");
 
     private static final Textos PT = new Textos("pt-BR",
             "almas sepultadas",
@@ -56,7 +58,8 @@ public record Textos(
             "Autópsia do Shishō",
             "O Shishō examinou o corpo e não achou falha. Morreu limpo.",
             "Nenhum arquivo morreu aqui ainda.",
-            "Todo arquivo deste repositório ainda está vivo. Volte depois da próxima refatoração.");
+            "Todo arquivo deste repositório ainda está vivo. Volte depois da próxima refatoração.",
+            "Som");
 
     public static Textos de(Lingua lingua) {
         return lingua == Lingua.pt ? PT : EN;

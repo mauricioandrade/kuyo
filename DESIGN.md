@@ -160,7 +160,22 @@ Chōchin: vermilion paper with rib lines (the ribs are the object's real structu
 
 ## Motion
 
-Motion only runs on graves inside the viewport (IntersectionObserver adds `.vivo`). Flames float on a 5s cycle (agitated 3.2s); violent flames add a tremor. Smoke rises on a dash offset. The yūrei enters with a 0.9 to 1.2s exponential ease-out and then hovers. Lanterns sway, mist drifts over 46 to 62s, stars twinkle. `prefers-reduced-motion` turns every animation off.
+Motion only runs on graves inside the viewport (IntersectionObserver adds `.vivo`), and every loop animates only `transform` and `opacity` on HTML-level layers so the compositor carries it: never SVG attributes such as `stroke-dashoffset`, never layout properties. Terraces off screen are skipped with `content-visibility: auto`.
+
+- **Arrival:** the first time a terrace enters the viewport, its hitodama ignite one by one (opacity and scale, 70 ms apart, capped at 900 ms).
+- **Approach (the focal moment):** the cause seal is stamped onto the washi like a hanko (scale and slight rotation settling in 420 ms, `cubic-bezier(.16, 1, .3, 1)`), the name fades up, the incense embers flare, the flames grow 15%, the smoke quickens and violent graves raise the yūrei (0.9 to 1.2 s exponential ease-out, then hovering).
+- **Ambient:** flames float on a 5 s cycle (agitated 3.2 s, violent 2.6 s plus a tremor on their container); smoke is two strands that rise, widen and fade under a static mask; lanterns sway; mist drifts over 46 to 62 s; stars twinkle in three groups.
+
+`prefers-reduced-motion` turns every CSS animation off; the seal still fades in, and the epitaph appears at once.
+
+## Sound
+
+Off by default, toggled by a small button in the top left (icon only on phones). Everything is synthesized with Web Audio, so the page stays one offline file:
+
+- **Ambient:** wind (filtered noise breathing on slow LFOs) and suzumushi, the bell cricket of Japanese autumn nights, chirping from random places in the stereo field.
+- **Approach:** an orin, the bowl bell struck at Buddhist services, with inharmonic partials and long tails. Its tone follows the cause: natural 587 Hz, premature higher (784 Hz), forgotten lower and softer (466 Hz), violent 415 Hz with a second bell detuned by 3 Hz so the two beat against each other.
+
+Nothing plays in a hidden tab.
 
 ## Do's and Don'ts
 
