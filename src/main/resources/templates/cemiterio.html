@@ -430,6 +430,8 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
   const calmo = matchMedia('(prefers-reduced-motion: reduce)');
   let ativo = null;
   let escrita = 0;
+  // devolver o foco ao túmulo ao fechar não pode reabrir o washi pelo evento focus
+  let devolvendo = false;
 
   new ResizeObserver(() => {
     document.documentElement.style.setProperty('--altura-washi', washi.offsetHeight + 'px');
@@ -495,14 +497,18 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
     [campo('nome').textContent, campo('caminho').textContent] = convite;
     for (const n of ['meta', 'palavras', 'epitafio', 'motivos', 'autopsia']) campo(n).textContent = '';
     vivo.textContent = '';
-    if (washi.contains(document.activeElement)) voltar.focus({ preventScroll: true });
+    if (washi.contains(document.activeElement)) {
+      devolvendo = true;
+      voltar.focus({ preventScroll: true });
+      devolvendo = false;
+    }
   }
   washi.querySelector('.washi__fechar').addEventListener('click', afastar);
   addEventListener('keydown', (e) => { if (e.key === 'Escape') afastar(); });
 
   document.querySelectorAll('.tumulo').forEach((t) => {
     t.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') aproximar(t); });
-    t.addEventListener('focus', () => aproximar(t));
+    t.addEventListener('focus', () => { if (!devolvendo) aproximar(t); });
     t.addEventListener('click', () => aproximar(t));
   });
 })();
