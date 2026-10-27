@@ -100,6 +100,13 @@ public record Textos(
         return pt ? "morreu tarde da noite, às " + hora : "died late at night, at " + hora;
     }
 
+    String vala(int almas, String ultimasPalavras) {
+        String palavras = ultimasPalavras.length() > 72 ? ultimasPalavras.substring(0, 71) + "…" : ultimasPalavras;
+        return lang.startsWith("pt")
+                ? almas + " almas caíram juntas com «" + palavras + "»"
+                : almas + " souls fell together to “" + palavras + "”";
+    }
+
     String palavrasSuspeitas() {
         return lang.startsWith("pt") ? "as últimas palavras confessam" : "its last words confess it";
     }

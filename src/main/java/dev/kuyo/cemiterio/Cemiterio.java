@@ -31,8 +31,26 @@ public record Cemiterio(
     }
 
     @TemplateData
-    public record Terraco(String rotulo, List<Tumulo> tumulos) {
+    public record Terraco(String rotulo, List<Tumulo> tumulos, String nota) {
+
+        Terraco(String rotulo, List<Tumulo> tumulos, Textos textos) {
+            this(rotulo, tumulos, valaComum(tumulos, textos));
+        }
+
+        /** Quando um único commit levou muitas almas do terraço, ele merece uma linha. */
+        private static String valaComum(List<Tumulo> tumulos, Textos textos) {
+            Map<String, List<Tumulo>> porCommit = new LinkedHashMap<>();
+            tumulos.forEach(t -> porCommit.computeIfAbsent(t.hash(), h -> new ArrayList<>()).add(t));
+            return porCommit.values().stream()
+                    .filter(v -> v.size() >= VALA_COMUM)
+                    .max(java.util.Comparator.comparingInt(List::size))
+                    .map(v -> textos.vala(v.size(), v.getFirst().ultimasPalavras()))
+                    .orElse(null);
+        }
     }
+
+    /** A partir de quantas almas um commit vira vala comum digna de nota. */
+    static final int VALA_COMUM = 5;
 
     private static final String[] FONTES = {
             "shippori-400-latin", "shippori-400-latin-ext",
@@ -57,9 +75,9 @@ public record Cemiterio(
         porMes.forEach((mes, porDia) -> {
             List<Tumulo> doMes = porDia.values().stream().flatMap(List::stream).toList();
             if (doMes.size() <= TERRACO_MAXIMO) {
-                terracos.add(new Terraco(textos.mes(mes), doMes));
+                terracos.add(new Terraco(textos.mes(mes), doMes, textos));
             } else {
-                porDia.forEach((dia, tumulos) -> terracos.add(new Terraco(textos.data(dia), tumulos)));
+                porDia.forEach((dia, tumulos) -> terracos.add(new Terraco(textos.data(dia), tumulos, textos)));
             }
         });
         List<Censo> censo = contagem.entrySet().stream()

@@ -26,6 +26,7 @@ public record Tumulo(
         int chamas,
         boolean violenta,
         boolean esquecida,
+        boolean prematura,
         String nascimento,
         String morte,
         String vida,
@@ -36,7 +37,8 @@ public record Tumulo(
         String epitafio,
         List<String> motivos,
         int alturaPilar,
-        double tamanhoNome) {
+        double tamanhoNome,
+        boolean duasColunas) {
 
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm");
     private static final int PILAR_MIN = 96;
@@ -65,6 +67,7 @@ public record Tumulo(
                 inquietacao < 0.3 ? 1 : inquietacao < 0.6 ? 2 : 3,
                 alma.causa() == CausaMortis.VIOLENTA,
                 alma.causa() == CausaMortis.ESQUECIDA,
+                alma.causa() == CausaMortis.PREMATURA,
                 t.data(f.nascimento().atZone(zona).toLocalDate()),
                 t.data(morte.quando().toLocalDate()),
                 vidaTexto,
@@ -75,7 +78,8 @@ public record Tumulo(
                 alma.epitafio(),
                 motivos(alma.laudo(), morte.arquivosAlterados() - 1, hora, vidaTexto, t),
                 altura,
-                tamanhoNome(nome, altura));
+                tamanhoNome(nome, altura),
+                tamanhoNome(nome, altura) < LEGIVEL);
     }
 
     /** 横死 morte violenta · 夭折 morte prematura · 無縁 sem ninguém que cuide do túmulo · 天寿 a vida que coube. */
@@ -95,10 +99,22 @@ public record Tumulo(
         return (int) Math.round(PILAR_MIN + fracao * (PILAR_MAX - PILAR_MIN));
     }
 
-    /** O nome é entalhado na vertical; nomes longos encolhem para caber no pilar. */
+    /** Abaixo disso o entalhe fica ilegível: o nome passa a ocupar duas colunas do pilar. */
+    static final double LEGIVEL = 11;
+
+    /** O nome é entalhado na vertical; nomes longos encolhem e, se preciso, dividem-se em duas colunas. */
     static double tamanhoNome(String nome, int alturaPilar) {
-        double cabe = (alturaPilar - 24) / (nome.length() * 0.62);
-        return Math.round(Math.max(8.5, Math.min(17, cabe)) * 10) / 10.0;
+        double espaco = alturaPilar - 40;
+        double umaColuna = espaco / (nome.length() * 0.62);
+        if (umaColuna >= LEGIVEL) {
+            return arredondar(Math.min(17, umaColuna));
+        }
+        double duas = espaco / (Math.ceil(nome.length() / 2.0) * 0.62);
+        return arredondar(Math.max(9, Math.min(LEGIVEL, duas)));
+    }
+
+    private static double arredondar(double tamanho) {
+        return Math.round(tamanho * 10) / 10.0;
     }
 
     /** O laudo em palavras: só os fatores que de fato pesaram. */
