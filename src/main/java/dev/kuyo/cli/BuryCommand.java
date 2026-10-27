@@ -67,12 +67,12 @@ public class BuryCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         List<Alma> almas = exumador.exumar(repo).stream().map(legista::examinar).toList();
+        // o cemitério vazio também é publicado: numa Action, a página existe antes do primeiro morto
         if (almas.isEmpty()) {
             System.out.println("Nenhum arquivo morto. Ninguém para velar.");
-            return 0;
         }
 
-        if (autopsia) {
+        if (autopsia && !almas.isEmpty()) {
             Optional<String> problema = shisho.problema();
             if (problema.isPresent()) {
                 System.err.println(problema.get());
@@ -83,7 +83,7 @@ public class BuryCommand implements Callable<Integer> {
 
         Path pasta = saida.toAbsolutePath().getParent();
         Files.createDirectories(pasta);
-        if (!semEpitafios) {
+        if (!semEpitafios && !almas.isEmpty()) {
             Optional<String> problema = mosteiro.problema();
             if (problema.isPresent()) {
                 System.err.println(problema.get());

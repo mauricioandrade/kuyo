@@ -1,0 +1,43 @@
+name: Cemetery
+
+# A cada push na main, o Kuyō enterra os próprios mortos e publica o site:
+# o docs/ (o cemitério de demonstração) e, em /self/, o cemitério deste repositório.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  bury:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bury Kuyō's own dead
+        uses: ./
+        with:
+          output: _site/self/index.html
+
+      - name: Add the demo cemetery
+        run: cp -r docs/. _site/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

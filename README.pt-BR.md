@@ -124,6 +124,50 @@ um ato de remoção bem direto.
 
 Aceita o caminho completo ou só o nome do arquivo. `-p "pergunta"` pergunta sem abrir a conversa interativa, e `/bye` deixa o espírito descansar.
 
+### 🤖 GitHub Action
+
+O Kuyō também é uma GitHub Action. Este workflow enterra o seu repositório a cada push na `main` e publica o cemitério no GitHub Pages (em *Settings → Pages → Source*, escolha *GitHub Actions*):
+
+```yaml
+name: Cemetery
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  bury:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: mauricioandrade/kuyo@main
+        with:
+          output: _site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - uses: actions/deploy-pages@v4
+```
+
+| Entrada | Padrão | Efeito |
+|---|---|---|
+| `path` | `.` | repositório a enterrar |
+| `output` | `cemiterio.html` | onde gravar o cemitério |
+| `lang` | `en` | `en` ou `pt` |
+| `model` | `gemma4:e4b` | modelo do Ollama para os epitáfios |
+| `epitaphs` | `true` | `false` dispensa o modelo, e o Ollama nem é instalado |
+| `autopsy` | `false` | `true` baixa o [Shishō](https://github.com/mauricioandrade/shisho) e examina cada arquivo Java morto |
+
+Quando há alguém para enterrar, a action instala o Ollama no runner e baixa o modelo, então o código continua sem sair da infraestrutura que você escolheu. Os epitáfios ficam em cache entre execuções, e só as mortes novas chamam o modelo. O modelo roda na CPU do runner, então o primeiro enterro de um histórico grande demora.
+
+O Kuyō se enterra assim: [o cemitério dele mesmo](https://mauricioandrade.github.io/kuyo/self/) é refeito a cada push. Ninguém morreu aqui ainda.
+
 ## 🔍 Como uma morte é investigada
 
 ### ⛏️ Exumação

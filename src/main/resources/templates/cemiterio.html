@@ -391,8 +391,13 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
   <span class="selo washi__selo" lang="ja" aria-hidden="true"></span>
   <div class="washi__corpo">
     <div>
+      {#if c.total == 0}
+      <h3 class="washi__nome">{c.textos.vazio}</h3>
+      <p class="washi__caminho">{c.textos.vazioDetalhe}</p>
+      {#else}
       <h3 class="washi__nome">{c.textos.convite}</h3>
       <p class="washi__caminho">{c.textos.conviteDetalhe}</p>
+      {/if}
     </div>
     <p class="washi__meta"></p>
     <p class="washi__palavras"></p>

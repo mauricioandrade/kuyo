@@ -1,0 +1,116 @@
+name: Kuyō
+description: Holds a funeral for every file deleted from your git history and renders the cemetery as one HTML page, with epitaphs written by a local Gemma.
+author: Mauricio Andrade
+branding:
+  icon: moon
+  color: purple
+
+inputs:
+  path:
+    description: Repository to bury, relative to the workspace. Needs the full history (actions/checkout with fetch-depth 0).
+    default: "."
+  output:
+    description: Where to write the cemetery. The epitaph cache (kuyo.json) goes next to it.
+    default: cemiterio.html
+  lang:
+    description: Language of the epitaphs and the page, "en" or "pt".
+    default: en
+  model:
+    description: Ollama model that writes the epitaphs.
+    default: gemma4:e4b
+  epitaphs:
+    description: Write epitaphs with the model ("true" or "false"). Without them, Ollama is never installed.
+    default: "true"
+  autopsy:
+    description: Ask the Shishō to examine every dead Java file ("true" or "false").
+    default: "false"
+
+outputs:
+  html:
+    description: Path of the cemetery.
+    value: ${{ inputs.output }}
+  souls:
+    description: How many files were laid to rest.
+    value: ${{ steps.dead.outputs.souls }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Java 25
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "25"
+
+    - name: Build Kuyō
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: ./mvnw -B -q package -DskipTests
+
+    - name: Count the dead
+      id: dead
+      shell: bash
+      env:
+        REPO: ${{ inputs.path }}
+        OUTPUT: ${{ inputs.output }}
+      run: |
+        # o Exumador precisa do histórico inteiro; um checkout raso enterraria quase ninguém
+        if [ "$(git -C "$REPO" rev-parse --is-shallow-repository)" = "true" ]; then
+          git -C "$REPO" fetch --quiet --unshallow
+        fi
+        mortos=$(java -jar "$GITHUB_ACTION_PATH/target/quarkus-app/quarkus-run.jar" scan "$REPO")
+        souls=$(grep -c '^✝' <<< "$mortos" || true)
+        echo "souls=$souls" >> "$GITHUB_OUTPUT"
+        echo "dir=$(dirname "$OUTPUT")" >> "$GITHUB_OUTPUT"
+
+    - name: Restore the epitaphs already written
+      if: inputs.epitaphs == 'true' && steps.dead.outputs.souls != '0'
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.dead.outputs.dir }}/kuyo.json
+        key: kuyo-${{ inputs.lang }}-${{ inputs.model }}-${{ github.sha }}
+        restore-keys: kuyo-${{ inputs.lang }}-${{ inputs.model }}-
+
+    - name: Wake the monk (Ollama)
+      if: inputs.epitaphs == 'true' && steps.dead.outputs.souls != '0'
+      shell: bash
+      env:
+        MODEL: ${{ inputs.model }}
+      run: |
+        curl -fsSL https://ollama.com/install.sh | sh
+        if ! curl -sf http://localhost:11434/api/tags > /dev/null; then
+          nohup ollama serve > "$RUNNER_TEMP/ollama.log" 2>&1 &
+        fi
+        for _ in $(seq 30); do
+          curl -sf http://localhost:11434/api/tags > /dev/null && break
+          sleep 1
+        done
+        ollama pull "$MODEL"
+
+    - name: Call the Shishō
+      if: inputs.autopsy == 'true' && steps.dead.outputs.souls != '0'
+      shell: bash
+      run: |
+        cd "$RUNNER_TEMP"
+        base=https://github.com/mauricioandrade/shisho/releases/latest/download
+        curl -fsSL "$base/shisho.jar" -o shisho.jar
+        curl -fsSL "$base/shisho.jar.sha256" -o shisho.jar.sha256
+        sha256sum -c shisho.jar.sha256
+        echo "KUYO_SHISHO=$RUNNER_TEMP/shisho.jar" >> "$GITHUB_ENV"
+
+    - name: Bury
+      shell: bash
+      env:
+        REPO: ${{ inputs.path }}
+        OUTPUT: ${{ inputs.output }}
+        LINGUA: ${{ inputs.lang }}
+        KUYO_MODELO: ${{ inputs.model }}
+        EPITAPHS: ${{ inputs.epitaphs }}
+        AUTOPSY: ${{ inputs.autopsy }}
+        SOULS: ${{ steps.dead.outputs.souls }}
+      run: |
+        args=(bury "$REPO" -o "$OUTPUT" --lang "$LINGUA")
+        if [ "$EPITAPHS" != "true" ]; then args+=(--sem-epitafios); fi
+        if [ "$AUTOPSY" = "true" ]; then args+=(--autopsia); fi
+        java -jar "$GITHUB_ACTION_PATH/target/quarkus-app/quarkus-run.jar" "${args[@]}"
+        printf '## 供養 Kuyō\n\n%s souls laid to rest in `%s`.\n' "$SOULS" "$OUTPUT" >> "$GITHUB_STEP_SUMMARY"

@@ -129,6 +129,50 @@ EmailService.java: The dead do not know such things.
 
 Pass a full path or just the file name. `--lang pt` makes the ghost speak Portuguese, `-p "question"` asks without opening the interactive session, and `/bye` lets the spirit rest.
 
+### 🤖 GitHub Action
+
+Kuyō is also a GitHub Action. This workflow buries your repository on every push to `main` and publishes the cemetery on GitHub Pages (set *Settings → Pages → Source* to *GitHub Actions*):
+
+```yaml
+name: Cemetery
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  bury:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: mauricioandrade/kuyo@main
+        with:
+          output: _site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - uses: actions/deploy-pages@v4
+```
+
+| Input | Default | Effect |
+|---|---|---|
+| `path` | `.` | repository to bury |
+| `output` | `cemiterio.html` | where to write the cemetery |
+| `lang` | `en` | `en` or `pt` |
+| `model` | `gemma4:e4b` | Ollama model for the epitaphs |
+| `epitaphs` | `true` | `false` skips the model, and Ollama is never installed |
+| `autopsy` | `false` | `true` downloads the [Shishō](https://github.com/mauricioandrade/shisho) and examines every dead Java file |
+
+When there is something to bury, the action installs Ollama on the runner and pulls the model, so the code still never leaves infrastructure you chose. Epitaphs are cached between runs, so only new deaths call the model. The model runs on the runner's CPU, so the first burial of a large history takes a while.
+
+Kuyō buries itself this way: [its own cemetery](https://mauricioandrade.github.io/kuyo/self/) is rebuilt on every push. Nothing has died here yet.
+
 ## 🔍 How a death is investigated
 
 ### ⛏️ Exhumation
