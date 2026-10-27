@@ -77,7 +77,7 @@ Apagado à 1h55 da manhã, num commit cuja mensagem diz `remove`, sem testes. Um
 java -jar target/quarkus-app/quarkus-run.jar bury caminho/do/repo -o cemiterio.html --lang pt
 ```
 
-O Gemma escreve um epitáfio por alma, cerca de um segundo cada numa GPU de notebook, e o Kuyō gera um único `cemiterio.html` autocontido: uma caminhada noturna por um cemitério japonês, um terraço por mês (ou por dia, quando um mês tem mortes demais). A altura do pilar é o tempo de vida do arquivo, as chamas são a inquietação, túmulos violentos ficam tortos e erguem um yūrei, os esquecidos criam musgo. Aproxime-se de um túmulo para ler o epitáfio.
+O Gemma escreve um epitáfio por alma, cerca de um segundo cada na minha máquina, e o Kuyō gera um único `cemiterio.html` autocontido: uma caminhada noturna por um cemitério japonês, um terraço por mês (ou por dia, quando um mês tem mortes demais). A altura do pilar é o tempo de vida do arquivo, as chamas são a inquietação, túmulos violentos ficam tortos e erguem um yūrei, os esquecidos criam musgo. Aproxime-se de um túmulo para ler o epitáfio.
 
 > Aqui jaz src/lib/rate-limit.ts, que serviu por seis dias guardando os limites. Seu fim veio com a resignação: "Remove src/lib/rate-limit.ts, que nao tinha mais nenhum uso — o Map em memoria nao funciona em serverless".
 

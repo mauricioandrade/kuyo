@@ -79,7 +79,7 @@ The CLI output is in Portuguese for now.
 java -jar target/quarkus-app/quarkus-run.jar bury path/to/repo -o cemiterio.html
 ```
 
-Gemma writes one epitaph per soul, about a second each on a laptop GPU, and Kuyō renders a single self-contained `cemiterio.html`: a night walk through a Japanese cemetery, one terrace per month (or per day, when a month holds too many deaths). Pillar height is the file's lifespan, the flames are its restlessness, violent graves lean and raise a yūrei, forgotten ones grow moss. Approach a grave to read its epitaph.
+Gemma writes one epitaph per soul, about a second each on my machine, and Kuyō renders a single self-contained `cemiterio.html`: a night walk through a Japanese cemetery, one terrace per month (or per day, when a month holds too many deaths). Pillar height is the file's lifespan, the flames are its restlessness, violent graves lean and raise a yūrei, forgotten ones grow moss. Approach a grave to read its epitaph.
 
 > Here rests SpikeResource.java, a brief experiment that lasted but nine hours. It met its end with the decree, "chore(web): remove phase 2 spike endpoint." May its ephemeral existence find quiet in the void.
 
