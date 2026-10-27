@@ -91,3 +91,7 @@ Proprietary code can't be sent to a closed API. Kuyō runs entirely on your mach
 ## Stack
 
 Java 25 · Quarkus (picocli) · JGit · LangChain4j + Ollama · Gemma · Qute
+
+## License
+
+[MIT](LICENSE)
