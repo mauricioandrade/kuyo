@@ -39,7 +39,7 @@ Built for the DEV Hacktoberfest 2026 challenge, week 4: *Ghost in the Machine*.
 |---|---|---|
 | `kuyo scan <repo>` | Lists the dead and their cause of death, no LLM | ✅ working |
 | `kuyo bury <repo> [-o out]` | Writes epitaphs with Gemma and renders the cemetery | ✅ working |
-| `kuyo seance <repo> <file>` | Talk to a dead file | 💭 if time allows |
+| `kuyo seance <repo> <file>` | Talk to a dead file | ✅ working |
 
 ## 🚀 Getting started
 
@@ -94,6 +94,26 @@ Epitaphs are cached in a `kuyo.json` next to the output, keyed by death commit, 
 |---|---|
 | `KUYO_MODELO` | `gemma4:e4b` |
 | `KUYO_OLLAMA_URL` | `http://localhost:11434` |
+
+### 🕯️ Séance
+
+```bash
+java -jar target/quarkus-app/quarkus-run.jar seance path/to/repo EmailService.java
+```
+
+The file's ghost answers in first person. It remembers its last contents and the facts of its life and death, and nothing else:
+
+```
+> What did you do when you were alive? Be specific.
+EmailService.java: My primary function was to send status change notifications via email.
+I held a method, `enviarMudancaStatus`, which asynchronously dispatched messages detailing
+updates to a specific order's status. I used a `JavaMailSender` to accomplish this task.
+
+> Who was the president of Brazil when you died?
+EmailService.java: The dead do not know such things.
+```
+
+Pass a full path or just the file name. `--lang pt` makes the ghost speak Portuguese, `-p "question"` asks without opening the interactive session, and `/bye` lets the spirit rest.
 
 ## 🔍 How a death is investigated
 

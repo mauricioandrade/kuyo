@@ -16,14 +16,18 @@ public class ModeloDoMonge implements Supplier<ChatModel> {
 
     @Override
     public ChatModel get() {
+        return criar(160);
+    }
+
+    /** O mesmo modelo com outro limite de tokens: a séance precisa de mais fôlego que um epitáfio. */
+    public static ChatModel criar(int maxTokens) {
         Config config = ConfigProvider.getConfig();
         return OllamaChatModel.builder()
                 .baseUrl(config.getValue("kuyo.ollama.url", String.class))
                 .modelName(config.getValue("kuyo.modelo", String.class))
-                // epitáfio é curto e tem que respeitar os fatos; sem raciocínio, senão o Gemma 4
-                // gasta todos os tokens pensando e devolve o epitáfio vazio
+                // sem raciocínio, senão o Gemma 4 gasta todos os tokens pensando e devolve texto vazio
                 .temperature(config.getValue("kuyo.temperatura", Double.class))
-                .numPredict(160)
+                .numPredict(maxTokens)
                 .think(false)
                 .timeout(Duration.ofSeconds(120))
                 .maxRetries(1)

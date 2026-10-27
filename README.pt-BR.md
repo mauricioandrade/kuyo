@@ -39,7 +39,7 @@ Feito para o desafio DEV Hacktoberfest 2026, semana 4: *Ghost in the Machine*.
 |---|---|---|
 | `kuyo scan <repo>` | Lista os mortos e a causa mortis, sem LLM | ✅ funcionando |
 | `kuyo bury <repo> [-o saida]` | Escreve os epitáfios com o Gemma e gera o cemitério | ✅ funcionando |
-| `kuyo seance <repo> <arquivo>` | Conversa com um arquivo morto | 💭 se der tempo |
+| `kuyo seance <repo> <arquivo>` | Conversa com um arquivo morto | ✅ funcionando |
 
 ## 🚀 Começando
 
@@ -92,6 +92,23 @@ Os epitáfios ficam em cache num `kuyo.json` ao lado da saída, pela chave commi
 |---|---|
 | `KUYO_MODELO` | `gemma4:e4b` |
 | `KUYO_OLLAMA_URL` | `http://localhost:11434` |
+
+### 🕯️ Séance
+
+```bash
+java -jar target/quarkus-app/quarkus-run.jar seance caminho/do/repo SpikeResource.java --lang pt
+```
+
+O fantasma do arquivo responde em primeira pessoa. Ele lembra do último conteúdo e dos fatos da vida e da morte, e de mais nada:
+
+```
+> Você tinha medo de ser apagado?
+SpikeResource.java: Medo é um conceito muito... tangível, não é? Eu existi por apenas
+nove horas, e o fim chegou rápido. Meu destino foi selado pelo commit `ff97d994`,
+um ato de remoção bem direto.
+```
+
+Aceita o caminho completo ou só o nome do arquivo. `-p "pergunta"` pergunta sem abrir a conversa interativa, e `/bye` deixa o espírito descansar.
 
 ## 🔍 Como uma morte é investigada
 

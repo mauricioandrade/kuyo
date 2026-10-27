@@ -90,7 +90,7 @@ public class Epitafista {
     }
 
     /** Em horas quando não chegou a um dia: "3 hours" rende mais que "0 days". */
-    static String vida(Duration vida) {
+    public static String vida(Duration vida) {
         if (vida.toDays() >= 1) {
             return vida.toDays() + (vida.toDays() == 1 ? " day" : " days");
         }
