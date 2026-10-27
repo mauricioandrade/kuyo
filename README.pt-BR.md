@@ -79,6 +79,8 @@ java -jar target/quarkus-app/quarkus-run.jar bury caminho/do/repo -o cemiterio.h
 
 O Gemma escreve um epitáfio por alma, cerca de um segundo cada na minha máquina, e o Kuyō gera um único `cemiterio.html` autocontido: uma caminhada noturna por um cemitério japonês, um terraço por mês (ou por dia, quando um mês tem mortes demais). A altura do pilar é o tempo de vida do arquivo, as chamas são a inquietação, túmulos violentos ficam tortos e erguem um yūrei, os esquecidos criam musgo. Aproxime-se de um túmulo para ler o epitáfio.
 
+<p align="center"><img src="docs/gifs/scared.gif" alt="Uma garota de anime gritando de pavor" width="320"></p>
+
 > Aqui jaz src/lib/rate-limit.ts, que serviu por seis dias guardando os limites. Seu fim veio com a resignação: "Remove src/lib/rate-limit.ts, que nao tinha mais nenhum uso — o Map em memoria nao funciona em serverless".
 
 | Opção | Efeito |
@@ -108,6 +110,8 @@ nove horas, e o fim chegou rápido. Meu destino foi selado pelo commit `ff97d994
 um ato de remoção bem direto.
 ```
 
+<p align="center"><img src="docs/gifs/that-was-scary.gif" alt="That was scary!" width="245"></p>
+
 Aceita o caminho completo ou só o nome do arquivo. `-p "pergunta"` pergunta sem abrir a conversa interativa, e `/bye` deixa o espírito descansar.
 
 ## 🔍 Como uma morte é investigada
@@ -120,6 +124,8 @@ O Kuyō lê o histórico com o [JGit](https://www.eclipse.org/jgit/), em Java pu
 - **Ressurreição é uma vida nova.** Um arquivo apagado e recriado depois no mesmo caminho morre duas vezes.
 - **Um merge é um evento só.** A mesma deleção nunca é contada duas vezes, e arquivos que morreram em branches nunca mergeadas ficam em paz.
 - **Lixo do sistema operacional não ganha funeral** (`*:Zone.Identifier`, `.DS_Store`, `Thumbs.db`).
+
+<p align="center"><img src="docs/gifs/are-you.gif" alt="Are you... (morto mesmo?)" width="320"></p>
 
 ### 👻 Inquietação
 
@@ -135,6 +141,8 @@ A inquietação é uma nota de 0 a 1, calculada de forma determinística em Java
 
 Os pesos foram calibrados com 175 mortes reais em nove repositórios meus. O primeiro rascunho usava escalas lineares, que saturavam quase na hora: na prática, arquivos morrem jovens e em valas comuns.
 
+<p align="center"><img src="docs/gifs/pikachu.gif" alt="Pikachu, nada bem" width="300"></p>
+
 ### ⚰️ Causa mortis
 
 Verificada nesta ordem:
@@ -143,6 +151,8 @@ Verificada nesta ordem:
 2. 🥀 **PREMATURA**: viveu menos de um dia
 3. 🕸️ **ESQUECIDA**: passou mais de um ano sem ser tocada antes de ser apagada
 4. 🕯️ **NATURAL**: todo o resto
+
+<p align="center"><img src="docs/gifs/triggered.gif" alt="TRIGGERED" width="240"></p>
 
 Um `.gitkeep` sempre morre de causas naturais. Ele existe para ser substituído por código de verdade, então cumpriu a missão.
 
@@ -154,7 +164,7 @@ Código proprietário não pode ser enviado para uma API fechada. O Kuyō roda i
 
 Java 25 · Quarkus (picocli) · JGit · LangChain4j + Ollama · Gemma · Qute
 
-Todo o visual, incluindo o banner acima, é desenhado à mão em SVG e CSS. Nenhuma imagem baixada.
+O cemitério e o banner são desenhados à mão em SVG e CSS, sem nenhuma imagem baixada. Os GIFs de reação deste README não são meus.
 
 O cemitério usa a [Shippori Mincho B1](https://github.com/fontdasu/ShipporiMincho), dos Shippori Mincho Project Authors, sob a [SIL Open Font License](src/main/resources/fonts/OFL.txt), embutida em recortes pequenos para a página continuar um arquivo único e offline.
 

@@ -81,6 +81,8 @@ java -jar target/quarkus-app/quarkus-run.jar bury path/to/repo -o cemiterio.html
 
 Gemma writes one epitaph per soul, about a second each on my machine, and Kuyō renders a single self-contained `cemiterio.html`: a night walk through a Japanese cemetery, one terrace per month (or per day, when a month holds too many deaths). Pillar height is the file's lifespan, the flames are its restlessness, violent graves lean and raise a yūrei, forgotten ones grow moss. Approach a grave to read its epitaph.
 
+<p align="center"><img src="docs/gifs/scared.gif" alt="An anime girl screaming in terror" width="320"></p>
+
 > Here rests SpikeResource.java, a brief experiment that lasted but nine hours. It met its end with the decree, "chore(web): remove phase 2 spike endpoint." May its ephemeral existence find quiet in the void.
 
 | Option | Effect |
@@ -113,6 +115,8 @@ updates to a specific order's status. I used a `JavaMailSender` to accomplish th
 EmailService.java: The dead do not know such things.
 ```
 
+<p align="center"><img src="docs/gifs/that-was-scary.gif" alt="That was scary!" width="245"></p>
+
 Pass a full path or just the file name. `--lang pt` makes the ghost speak Portuguese, `-p "question"` asks without opening the interactive session, and `/bye` lets the spirit rest.
 
 ## 🔍 How a death is investigated
@@ -125,6 +129,8 @@ Kuyō reads history with [JGit](https://www.eclipse.org/jgit/), in pure Java, wi
 - **Resurrections count as new lives.** A file deleted and later recreated at the same path dies twice.
 - **A merge is one event.** The same deletion is never counted twice, and files that died on branches never merged are left alone.
 - **OS junk gets no funeral** (`*:Zone.Identifier`, `.DS_Store`, `Thumbs.db`).
+
+<p align="center"><img src="docs/gifs/are-you.gif" alt="Are you... (really dead?)" width="320"></p>
 
 ### 👻 Restlessness
 
@@ -140,6 +146,8 @@ Restlessness is a score from 0 to 1, computed deterministically in Java. The mod
 
 The weights were calibrated against 175 real deaths across nine of my own repositories. The first draft used linear scales, which saturated almost immediately: in practice files die young and in mass graves.
 
+<p align="center"><img src="docs/gifs/pikachu.gif" alt="Pikachu, deeply unwell" width="300"></p>
+
 ### ⚰️ Cause of death
 
 Checked in this order:
@@ -148,6 +156,8 @@ Checked in this order:
 2. 🥀 **PREMATURA** (premature): lived less than a day
 3. 🕸️ **ESQUECIDA** (forgotten): untouched for more than a year before deletion
 4. 🕯️ **NATURAL**: everything else
+
+<p align="center"><img src="docs/gifs/triggered.gif" alt="TRIGGERED" width="240"></p>
 
 `.gitkeep` files always die of natural causes. They exist to be replaced by real code, so their mission was accomplished.
 
@@ -159,7 +169,7 @@ Proprietary code can't be sent to a closed API. Kuyō runs entirely on your mach
 
 Java 25 · Quarkus (picocli) · JGit · LangChain4j + Ollama · Gemma · Qute
 
-Every visual, including the banner above, is drawn by hand in SVG and CSS. No downloaded images.
+The cemetery and the banner are drawn by hand in SVG and CSS, with no downloaded images. The reaction GIFs in this README are not mine.
 
 The cemetery uses [Shippori Mincho B1](https://github.com/fontdasu/ShipporiMincho) by the Shippori Mincho Project Authors, under the [SIL Open Font License](src/main/resources/fonts/OFL.txt), embedded as small subsets so the page stays a single offline file.
 
