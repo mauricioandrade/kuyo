@@ -273,6 +273,13 @@ main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
 .som[aria-pressed="true"] { color: var(--texto); border-color: var(--lanterna); }
 .som[aria-pressed="true"] .som__onda { opacity: 1; }
 .som[aria-pressed="true"] .som__corte { opacity: 0; }
+/* uma hitodama acompanha o cursor; só com mouse e sem redução de movimento */
+.companheira { position: fixed; z-index: 9; left: 0; top: 0; width: 13px; height: 28px; pointer-events: none; opacity: 0;
+  transform-origin: 6.5px 21.5px; transition: opacity .6s ease; will-change: transform; }
+.companheira.acordada { opacity: .9; }
+.companheira.sobre-washi { opacity: 0; }
+.companheira .hitodama { --cor: var(--cor-companheira, var(--chama-calma)); transition: none; }
+.companheira .hitodama::before, .companheira .hitodama::after { transition: background .5s ease, box-shadow .5s ease; }
 .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .relatos { display: none; }
 
@@ -2540,6 +2547,8 @@ footer { text-align: center; color: var(--texto-suave); font-size: .9rem; paddin
 
 <footer><p>Every file here served once. Kuyō, a memorial for objects that served well.</p></footer>
 
+<div class="companheira" aria-hidden="true"><i class="hitodama"></i></div>
+
 <div class="nevoa" aria-hidden="true"><span></span><span></span><span></span></div>
 
 <aside class="washi" data-vazio aria-label="Epitaph">
@@ -4169,6 +4178,48 @@ Its documentation has been merged, its narrative becoming part of the collective
     }
   }
   washi.querySelector('.washi__fechar').addEventListener('click', afastar);
+
+  // ---------- a hitodama que segue o visitante ----------
+  // Segue o cursor com atraso de mola; a cauda aponta para trás do movimento e estica com a velocidade.
+  // O laço de quadros só roda enquanto ela ainda está chegando, e para quando assenta.
+  (() => {
+    const mouse = matchMedia('(pointer: fine)');
+    if (!mouse.matches || calmo.matches) return;
+    const el = document.querySelector('.companheira');
+    const cores = { 1: 'var(--chama-calma)', 2: 'var(--chama-agitada)', 3: 'var(--chama-violenta)' };
+    let alvoX = 0, alvoY = 0, x = 0, y = 0, angulo = 0, esticar = 1, rodando = false, acordada = false;
+
+    function quadro(agora) {
+      const vx = (alvoX - x) * .11, vy = (alvoY - y) * .11;
+      x += vx; y += vy;
+      const velocidade = Math.hypot(vx, vy);
+      // parada, a cauda sobe; em movimento, aponta para trás
+      const desejado = velocidade > .4 ? Math.atan2(vy, vx) * 180 / Math.PI - 90 : 0;
+      let delta = ((desejado - angulo + 540) % 360) - 180;
+      angulo += delta * (velocidade > .4 ? .18 : .06);
+      esticar += (1 + Math.min(velocidade / 18, .7) - esticar) * .2;
+      const boia = Math.sin(agora / 620) * 3;
+      el.style.transform = `translate3d(${x}px, ${y + boia}px, 0) rotate(${angulo}deg) scale(${1 / Math.sqrt(esticar)}, ${esticar})`;
+      if (velocidade > .05 || Math.abs(delta) > .5 || Math.abs(esticar - 1) > .01) requestAnimationFrame(quadro);
+      else { rodando = false; flutuar(); }
+    }
+    // assentada, ela só boia, por CSS, sem laço de quadros
+    function flutuar() { el.animate([{ translate: '0 0' }, { translate: '2px -6px' }, { translate: '0 0' }], { duration: 3200, iterations: Infinity, easing: 'ease-in-out', composite: 'add' }); }
+
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      // flutua um pouco acima e à direita, para nunca cobrir o cursor
+      alvoX = e.clientX + 16; alvoY = e.clientY - 40;
+      if (!acordada) { x = alvoX; y = alvoY + 20; acordada = true; el.classList.add('acordada'); }
+      const tumulo = e.target.closest?.('.tumulo');
+      const chamas = tumulo?.querySelector('.tumulo__chamas')?.className.match(/chamas-(\d)/)?.[1];
+      el.style.setProperty('--cor-companheira', cores[chamas] ?? 'var(--chama-calma)');
+      el.classList.toggle('sobre-washi', !!e.target.closest?.('.washi, .som'));
+      if (!rodando) { rodando = true; el.getAnimations().forEach((a) => a.cancel()); requestAnimationFrame(quadro); }
+    }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => el.classList.remove('acordada'));
+    document.documentElement.addEventListener('pointerenter', () => { if (acordada) el.classList.add('acordada'); });
+  })();
 
   // ---------- som ----------
   // Tudo é sintetizado: nenhum arquivo de áudio, a página continua sendo um arquivo só.

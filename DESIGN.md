@@ -164,6 +164,7 @@ Motion only runs on graves inside the viewport (IntersectionObserver adds `.vivo
 
 - **Arrival:** the first time a terrace enters the viewport, its hitodama ignite one by one (opacity and scale, 70 ms apart, capped at 900 ms).
 - **Approach (the focal moment):** the cause seal is stamped onto the washi like a hanko (scale and slight rotation settling in 420 ms, `cubic-bezier(.16, 1, .3, 1)`), the name fades up, the incense embers flare, the flames grow 15%, the smoke quickens and violent graves raise the yūrei (0.9 to 1.2 s exponential ease-out, then hovering).
+- **Companion:** with a mouse, one hitodama follows the visitor's cursor, floating above and to the right of it so it never covers the pointer. It trails on a spring, its tail points back along the motion and stretches with speed, and over a grave it takes that grave's restlessness color. It hides over the washi and the sound button, its frame loop stops once it settles, and it is absent on touch and under reduced motion. It is a spirit flame, not a cartoon ghost.
 - **Ambient:** flames float on a 5 s cycle (agitated 3.2 s, violent 2.6 s plus a tremor on their container); smoke is two strands that rise, widen and fade under a static mask; lanterns sway; mist drifts over 46 to 62 s; stars twinkle in three groups.
 
 `prefers-reduced-motion` turns every CSS animation off; the seal still fades in, and the epitaph appears at once.
