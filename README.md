@@ -134,7 +134,9 @@ Pass a full path or just the file name. `--lang pt` makes the ghost speak Portug
 java -jar target/quarkus-app/quarkus-run.jar haunt >> ~/.bashrc   # or ~/.zshrc
 ```
 
-This possesses your shell. From then on, when you delete a tracked file the file whispers back a second later, in first person, written by Gemma from the facts of its life:
+Run it with Java 25 (`java -version`): the hook records the absolute path of the `java` that printed it.
+
+This possesses your shell. From then on, when you delete a tracked file the file whispers back a few seconds later, in first person, written by Gemma from the facts of its life:
 
 ```
 $ rm src/EmailService.java

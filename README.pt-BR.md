@@ -131,7 +131,9 @@ Aceita o caminho completo ou só o nome do arquivo. `-q "pergunta"` pergunta sem
 java -jar target/quarkus-app/quarkus-run.jar haunt --lang pt >> ~/.bashrc   # ou ~/.zshrc
 ```
 
-Isso possui o seu shell. A partir daí, quando você apaga um arquivo rastreado, ele sussurra de volta um segundo depois, em primeira pessoa, com uma fala que o Gemma escreve a partir dos fatos da vida dele:
+Rode com o Java 25 (`java -version`): o hook grava o caminho absoluto do `java` que o gerou.
+
+Isso possui o seu shell. A partir daí, quando você apaga um arquivo rastreado, ele sussurra de volta alguns segundos depois, em primeira pessoa, com uma fala que o Gemma escreve a partir dos fatos da vida dele:
 
 ```
 $ rm src/EmailService.java
