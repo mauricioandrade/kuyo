@@ -15,7 +15,7 @@ Two audiences, demo first:
 
 ## Product Purpose
 
-Kuyō reads a git repository's history, finds every deleted file and holds a funeral for each: how it lived, how it died, how restless its soul is. Java computes the facts deterministically; a local Gemma model on Ollama writes the epitaphs. The output is one self-contained `cemiterio.html`.
+Kuyō reads a git repository's history, finds every deleted file and holds a funeral for each: how it lived, how it died, how restless its soul is. Java computes the facts deterministically; a local Gemma model on Ollama writes the epitaphs. The output is one self-contained `cemetery.html`.
 
 Success: a viewer feels the code they deleted was honored, smiles at an epitaph, and understands at a glance which deaths were violent.
 
@@ -31,7 +31,7 @@ The code never leaves the machine. Offline, free per run, model swappable by con
 ## Capabilities and Constraints
 
 - Single self-contained HTML file: CSS, SVG and JS inline. No downloaded images; every visual hand-drawn in SVG/CSS. No external fonts or scripts.
-- Data per soul: path, file name, cause of death (violenta, prematura, esquecida, natural), restlessness 0–1 with five factor scores, birth and death dates, hour of death, last words (commit message first line), death commit hash, authors, epitaph (may be absent with `--sem-epitafios`).
+- Data per soul: path, file name, cause of death (violent, premature, forgotten, natural), restlessness 0–1 with five factor scores, birth and death dates, hour of death, last words (commit message first line), death commit hash, authors, epitaph (may be absent with `--no-epitaphs`).
 - Restlessness bands drive the haunting: < 0.3 one blue flame; 0.3–0.6 two flames; ≥ 0.6 three violet flames, tremor, yūrei on hover.
 - `prefers-reduced-motion` disables all animation.
 - Epitaphs in English by default, Portuguese with `--lang pt`.

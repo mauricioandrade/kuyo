@@ -2,29 +2,29 @@
 name: Kuyō
 description: A night walk through a Japanese cemetery where every deleted file has its own grave.
 colors:
-  noite: "#0d1130"
-  noite-alta: "#070920"
-  horizonte: "#1d2452"
-  chao: "#1a1f45"
-  chao-borda: "#3b4170"
-  granito: "#565b74"
-  granito-luz: "#7a809b"
-  granito-sombra: "#343850"
-  ouro: "#eadcb0"
-  madeira: "#c8b48a"
-  madeira-sombra: "#9c8862"
-  musgo: "#5d7a45"
+  night: "#0d1130"
+  night-deep: "#070920"
+  horizon: "#1d2452"
+  ground: "#1a1f45"
+  ground-edge: "#3b4170"
+  granite: "#565b74"
+  granite-light: "#7a809b"
+  granite-shadow: "#343850"
+  gold: "#eadcb0"
+  wood: "#c8b48a"
+  wood-shadow: "#9c8862"
+  moss: "#5d7a45"
   washi: "#f1e9d8"
-  washi-fundo: "#e7dcc4"
+  washi-deep: "#e7dcc4"
   sumi: "#231d19"
-  sumi-suave: "#5a4f45"
+  sumi-soft: "#5a4f45"
   shu: "#c8402b"
-  lanterna: "#ff9a48"
-  chama-calma: "#a8dcff"
-  chama-agitada: "#80aaff"
-  chama-violenta: "#b98dff"
-  texto: "#ece7f7"
-  texto-suave: "#b2aed0"
+  lantern: "#ff9a48"
+  flame-calm: "#a8dcff"
+  flame-uneasy: "#80aaff"
+  flame-violent: "#b98dff"
+  text: "#ece7f7"
+  text-soft: "#b2aed0"
 typography:
   display:
     fontFamily: "Shippori Mincho B1, Hiragino Mincho ProN, Yu Mincho, serif"
@@ -79,12 +79,12 @@ components:
     rounded: "{rounded.paper}"
     padding: "18px 24px 20px"
   kanban:
-    backgroundColor: "{colors.madeira}"
+    backgroundColor: "{colors.wood}"
     textColor: "{colors.sumi}"
     rounded: "{rounded.board}"
   grave-pillar:
-    backgroundColor: "{colors.granito}"
-    textColor: "{colors.ouro}"
+    backgroundColor: "{colors.granite}"
+    textColor: "{colors.gold}"
     rounded: "{rounded.stone}"
     width: "46px"
 ---
@@ -110,15 +110,15 @@ Full palette in named roles. The ground is aizome indigo, never black.
 - **Shu vermilion** (`shu`): seals, lantern paper, the typing caret, the "why it does not rest" line.
 
 ### Secondary
-- **Lantern amber** (`lanterna`): real light sources only (chōchin, tōrō firebox, incense embers) and the focus ring.
-- **Hitodama blues and violet** (`chama-*`): the only cold light. Calm flames are pale blue, agitated ones blue, violent ones violet.
+- **Lantern amber** (`lantern`): real light sources only (chōchin, tōrō firebox, incense embers) and the focus ring.
+- **Hitodama blues and violet** (`flame-*`): the only cold light. Calm flames are pale blue, agitated ones blue, violent ones violet.
 
 ### Neutral
-- Night (`noite`, `noite-alta`, `horizonte`), granite (`granito*`), ground (`chao*`), washi paper (`washi*`) with sumi ink (`sumi*`), and wood (`madeira*`).
+- Night (`night`, `night-deep`, `horizon`), granite (`granite*`), ground (`ground*`), washi paper (`washi*`) with sumi ink (`sumi*`), and wood (`wood*`).
 
 ### Named Rules
 - **Light has a source.** Glow is allowed only on things that emit light in the scene: moon, lanterns, embers, spirit flames. Nothing else glows.
-- **Gold leaf carving.** Names on pillars are filled with `ouro`, as Japanese grave inscriptions are painted, so they stay legible on granite.
+- **Gold leaf carving.** Names on pillars are filled with `gold`, as Japanese grave inscriptions are painted, so they stay legible on granite.
 
 ## Typography
 
@@ -160,7 +160,7 @@ Chōchin: vermilion paper with rib lines (the ribs are the object's real structu
 
 ## Motion
 
-Motion only runs on graves inside the viewport (IntersectionObserver adds `.vivo`), and every loop animates only `transform` and `opacity` on HTML-level layers so the compositor carries it: never SVG attributes such as `stroke-dashoffset`, never layout properties. Terraces off screen are skipped with `content-visibility: auto`.
+Motion only runs on graves inside the viewport (IntersectionObserver adds `.alive`), and every loop animates only `transform` and `opacity` on HTML-level layers so the compositor carries it: never SVG attributes such as `stroke-dashoffset`, never layout properties. Terraces off screen are skipped with `content-visibility: auto`.
 
 - **Arrival:** the first time a terrace enters the viewport, its hitodama ignite one by one (opacity and scale, 70 ms apart, capped at 900 ms).
 - **Approach (the focal moment):** the cause seal is stamped onto the washi like a hanko (scale and slight rotation settling in 420 ms, `cubic-bezier(.16, 1, .3, 1)`), the name fades up, the incense embers flare, the flames grow 15%, the smoke quickens and violent graves raise the yūrei (0.9 to 1.2 s exponential ease-out, then hovering).

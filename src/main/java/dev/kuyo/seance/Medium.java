@@ -1,9 +1,9 @@
 package dev.kuyo.seance;
 
-import dev.kuyo.dominio.Alma;
-import dev.kuyo.dominio.Falecido;
-import dev.kuyo.epitafio.Epitafista;
-import dev.kuyo.epitafio.Lingua;
+import dev.kuyo.domain.Deceased;
+import dev.kuyo.domain.Soul;
+import dev.kuyo.epitaph.EpitaphWriter;
+import dev.kuyo.epitaph.Language;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -17,42 +17,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Conduz a conversa com um arquivo morto. O fantasma só sabe o que viveu: o último conteúdo
- * e os fatos do Legista. A conversa inteira vai a cada pergunta, então ela é curta por natureza.
+ * Conducts the conversation with a dead file. The ghost only knows what it lived: its last contents
+ * and the Coroner's facts. The whole conversation is sent with every question, so it is short by nature.
  */
 public class Medium {
 
-    /** Um modelo pequeno se perde com arquivos enormes; o começo do arquivo basta para lembrar quem era. */
-    static final int LEMBRANCA_MAXIMA = 12_000;
+    /** A small model gets lost in huge files; the start of the file is enough to remember who it was. */
+    static final int MAX_MEMORY = 12_000;
 
-    private static final DateTimeFormatter DATA = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter DATE = DateTimeFormatter.ISO_LOCAL_DATE.withZone(ZoneId.systemDefault());
 
-    private final ChatModel modelo;
-    private final List<ChatMessage> conversa = new ArrayList<>();
+    private final ChatModel model;
+    private final List<ChatMessage> conversation = new ArrayList<>();
 
-    public Medium(ChatModel modelo, Alma alma, Lingua lingua) {
-        this.modelo = modelo;
-        conversa.add(SystemMessage.from(invocacao(alma, lingua)));
+    public Medium(ChatModel model, Soul soul, Language language) {
+        this.model = model;
+        conversation.add(SystemMessage.from(invocation(soul, language)));
     }
 
-    /** O fantasma fala primeiro, ao ser chamado. */
-    public String chamar() {
-        return perguntar("(The medium lights the incense and calls your name. Greet the living in one or two sentences.)");
+    /** The ghost speaks first, when it is called. */
+    public String call() {
+        return ask("(The medium lights the incense and calls your name. Greet the living in one or two sentences.)");
     }
 
-    public String perguntar(String pergunta) {
-        conversa.add(UserMessage.from(pergunta));
-        String resposta = modelo.chat(conversa).aiMessage().text().strip();
-        conversa.add(AiMessage.from(resposta));
-        return resposta;
+    public String ask(String question) {
+        conversation.add(UserMessage.from(question));
+        String answer = model.chat(conversation).aiMessage().text().strip();
+        conversation.add(AiMessage.from(answer));
+        return answer;
     }
 
-    static String invocacao(Alma alma, Lingua lingua) {
-        Falecido f = alma.falecido();
-        var morte = f.commitDaMorte();
-        String lembranca = f.binario() || f.ultimoConteudo() == null
+    static String invocation(Soul soul, Language language) {
+        Deceased d = soul.deceased();
+        var death = d.deathCommit();
+        String memory = d.binary() || d.lastContents() == null
                 ? "(You were a binary file. You remember no words, only shapes.)"
-                : recortar(f.ultimoConteudo());
+                : trim(d.lastContents());
 
         return """
                 You are the ghost of %s, a source file that was deleted from a git repository.
@@ -77,20 +77,20 @@ public class Medium {
                 %s
                 ```
                 """.formatted(
-                f.caminho(), lingua == Lingua.pt ? "Brazilian Portuguese" : "English",
-                DATA.format(f.nascimento()), DATA.format(f.morte()),
-                Epitafista.vida(Duration.between(f.nascimento(), f.morte())),
-                String.join(", ", f.autores()), f.commitsEmVida(),
-                alma.causa().name().toLowerCase(), alma.inquietacao(),
-                morte.hash(), morte.autor(), morte.quando().toLocalTime(), morte.arquivosAlterados() - 1,
-                morte.mensagem(),
-                lembranca);
+                d.path(), language.nameForTheModel,
+                DATE.format(d.born()), DATE.format(d.died()),
+                EpitaphWriter.life(Duration.between(d.born(), d.died())),
+                String.join(", ", d.authors()), d.commitsInLife(),
+                soul.cause().name().toLowerCase(), soul.restlessness(),
+                death.hash(), death.author(), death.when().toLocalTime(), death.filesChanged() - 1,
+                death.message(),
+                memory);
     }
 
-    static String recortar(String conteudo) {
-        if (conteudo.length() <= LEMBRANCA_MAXIMA) {
-            return conteudo;
+    static String trim(String contents) {
+        if (contents.length() <= MAX_MEMORY) {
+            return contents;
         }
-        return conteudo.substring(0, LEMBRANCA_MAXIMA) + "\n… (the rest has faded)";
+        return contents.substring(0, MAX_MEMORY) + "\n… (the rest has faded)";
     }
 }

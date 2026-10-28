@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="{c.texts.lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Kuyō 供養 · {c.repo}</title>
+<script>document.documentElement.classList.add('js');</script>
+<style>
+@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fonts.get('f400latin')}) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fonts.get('f400latinext')}) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fonts.get('f700latin')}) format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fonts.get('f700latinext')}) format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+{! Chrome groups faces by weight before combining unicode-range: the kanji need one face per weight !}
+@font-face { font-family: "Shippori"; font-weight: 400; font-display: swap; src: url(data:font/woff2;base64,{c.fonts.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF, U+5E2B; }
+@font-face { font-family: "Shippori"; font-weight: 700; font-display: swap; src: url(data:font/woff2;base64,{c.fonts.get('f700kanji')}) format("woff2"); unicode-range: U+4F9B, U+990A, U+6A2A, U+6B7B, U+592D, U+6298, U+7121, U+7E01, U+5929, U+5BFF, U+5E2B; }
+</style>
+<style>{|
+:root {
+  --night: #0d1130;
+  --night-deep: #070920;
+  --horizon: #1d2452;
+  --ground: #1a1f45;
+  --ground-edge: #3b4170;
+  --granite: #565b74;
+  --granite-light: #7a809b;
+  --granite-shadow: #343850;
+  --gold: #eadcb0;
+  --wood: #c8b48a;
+  --wood-shadow: #9c8862;
+  --moss: #5d7a45;
+  --washi: #f1e9d8;
+  --washi-deep: #e7dcc4;
+  --sumi: #231d19;
+  --sumi-soft: #5a4f45;
+  --shu: #c8402b;
+  --lantern: #ff9a48;
+  --flame-calm: #a8dcff;
+  --flame-uneasy: #80aaff;
+  --flame-violent: #b98dff;
+  --text: #ece7f7;
+  --text-soft: #b2aed0;
+  --washi-height: 132px;
+  --grave-scale: 1;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scrollbar-color: var(--granite) var(--night-deep); }
+::selection { background: var(--shu); color: var(--washi); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--night);
+  color: var(--text);
+  font: 400 1rem/1.6 "Shippori", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  padding-bottom: calc(var(--washi-height) + 40px);
+  overflow-x: hidden;
+}
+:focus-visible { outline: 2px solid var(--lantern); outline-offset: 4px; border-radius: 4px; }
+
+/* ---------- sky ---------- */
+.sky { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background: linear-gradient(180deg, var(--night-deep) 0%, var(--night) 45%, var(--horizon) 100%); }
+.sky svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.star { fill: #e6e1ff; }
+.stars { animation: twinkle 5s ease-in-out infinite; }
+.stars:nth-of-type(2) { animation-duration: 7s; animation-delay: -1.7s; }
+.stars:nth-of-type(3) { animation-duration: 6s; animation-delay: -3.1s; }
+.moon { position: absolute; top: 7vh; right: 9vw; width: clamp(64px, 9vw, 120px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #fbf5df 0 45%, #e9dfbd 70%, #d7caa1 100%);
+  box-shadow: 0 0 60px 18px rgba(240, 230, 190, .16), 0 0 160px 60px rgba(240, 230, 190, .06); }
+.hills { position: absolute; left: 0; right: 0; bottom: 0; height: 32vh; }
+
+/* ---------- portal ---------- */
+.portal { display: grid; justify-items: center; gap: 28px; padding: 0 16px 24px; position: relative; }
+.lanterns { display: flex; align-items: flex-start; justify-content: center; gap: clamp(16px, 5vw, 64px); width: 100%; max-width: 980px; }
+.kanban { position: relative; margin-top: 64px; background: linear-gradient(180deg, #d6c096, #c3a979 60%, #b29766);
+  color: var(--sumi); padding: 22px clamp(20px, 4vw, 44px) 20px; border-radius: 6px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .55), inset 0 0 0 2px rgba(60, 40, 20, .25);
+  display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: clamp(16px, 3vw, 32px); max-width: 640px; }
+.kanban::before, .kanban::after { content: ""; position: absolute; top: -64px; width: 2px; height: 64px; background: #8a7350; }
+.kanban::before { left: 18%; } .kanban::after { right: 18%; }
+.kanban__kanji { font-weight: 700; font-size: clamp(2.6rem, 7vw, 4.2rem); line-height: 1; writing-mode: vertical-rl; letter-spacing: .08em; color: var(--sumi); }
+.kanban h1 { margin: 0; font-weight: 700; font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.05; letter-spacing: -.01em; }
+.kanban__repo { margin: 6px 0 0; font-size: clamp(1rem, 2.4vw, 1.25rem); color: #3a2f25; overflow-wrap: anywhere; }
+.kanban__total { margin: 10px 0 0; font-size: .95rem; color: #4a3e33; }
+.kanban__total b { font-weight: 700; font-variant-numeric: lining-nums; color: var(--sumi); font-size: 1.15rem; }
+
+.chochin { flex: none; position: relative; width: clamp(44px, 8vw, 74px); margin-top: 24px; animation: sway 7s ease-in-out infinite; transform-origin: 50% -40px; }
+.chochin:last-child { animation-delay: -3.4s; }
+.chochin::before { content: ""; position: absolute; left: 50%; top: -40px; width: 2px; height: 40px; background: #6a5a44; }
+.chochin__body { position: relative; aspect-ratio: 3 / 4.2; border-radius: 46% / 40%;
+  background:
+    repeating-linear-gradient(180deg, rgba(90, 20, 10, .35) 0 1px, transparent 1px 9px),
+    radial-gradient(ellipse at 50% 45%, #ffcf8a 0%, #f1743c 40%, #b8321f 78%, #7d1c12 100%);
+  box-shadow: 0 0 40px 10px rgba(255, 140, 60, .28), 0 0 120px 40px rgba(255, 120, 50, .10);
+  animation: flicker 3.7s steps(1, end) infinite; }
+.chochin:last-child .chochin__body { animation-delay: -1.3s; }
+.chochin__body::before, .chochin__body::after { content: ""; position: absolute; left: 22%; right: 22%; height: 9%; background: #1b1513; border-radius: 3px; }
+.chochin__body::before { top: -5%; } .chochin__body::after { bottom: -5%; }
+
+.census { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; }
+.census li { display: flex; align-items: center; gap: 10px; color: var(--text-soft); font-size: .95rem; }
+.census b { color: var(--text); font-weight: 700; font-variant-numeric: lining-nums tabular-nums; }
+.seal { display: inline-grid; place-items: center; width: 30px; height: 30px; background: var(--shu); color: var(--washi);
+  font-weight: 700; font-size: .78rem; line-height: 1; border-radius: 4px; writing-mode: vertical-rl; letter-spacing: .02em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .35); }
+.legend { display: flex; gap: 22px; color: var(--text-soft); font-size: .85rem; flex-wrap: wrap; justify-content: center; margin: 0; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend .hitodama { position: relative; animation: none; margin: 0 -1px; vertical-align: -6px; }
+
+/* ---------- terraces ---------- */
+main { max-width: 1240px; margin: 0 auto; padding: 8px 16px 0; }
+.terrace { position: relative; margin-top: 46px; content-visibility: auto; contain-intrinsic-size: auto 420px; }
+.marker { display: flex; align-items: flex-end; gap: 14px; margin: 0 0 -6px 4px; position: relative; z-index: 1; }
+.marker h2 { margin: 0 0 6px; font-size: clamp(1.15rem, 2.6vw, 1.45rem); font-weight: 700; letter-spacing: .01em; }
+.marker p { margin: 0 0 8px; color: var(--text-soft); font-size: .9rem; font-variant-numeric: lining-nums; }
+.marker .note { flex-basis: 100%; margin: 0 0 4px 48px; font-size: .92rem; max-width: 70ch; }
+.marker { flex-wrap: wrap; }
+.toro { flex: none; width: 34px; display: grid; justify-items: center; }
+.toro__kasa { width: 34px; height: 10px; background: var(--granite-light); clip-path: polygon(12% 0, 88% 0, 100% 100%, 0 100%); }
+.toro__light { width: 20px; height: 15px; background: var(--granite); display: grid; place-items: center; }
+.toro__light::after { content: ""; width: 10px; height: 9px; background: #ffc27a; border-radius: 1px; box-shadow: 0 0 14px 5px rgba(255, 170, 90, .45); animation: flicker 4.3s steps(1, end) infinite; }
+.toro__post { width: 10px; height: 26px; background: var(--granite-shadow); }
+.toro__foot { width: 26px; height: 7px; background: var(--granite); }
+
+.row { list-style: none; margin: 0; padding: 18px 8px 0 8px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 30px 26px; }
+.row li { position: relative; }
+.row li::before { content: ""; position: absolute; left: -14px; right: -14px; bottom: 0; height: 22px;
+  background: linear-gradient(180deg, var(--ground-edge) 0 2px, var(--ground) 2px); }
+.row li:first-child::before { left: -8px; }
+.step { height: 14px; background: linear-gradient(180deg, var(--ground-edge), var(--ground)); border-radius: 0 0 3px 3px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .35); }
+
+/* ---------- grave ---------- */
+.grave { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: grid; justify-items: center; align-content: end;
+  width: calc(108px * var(--grave-scale)); padding-top: 64px; -webkit-tap-highlight-color: transparent; }
+.grave:focus-visible { outline: 2px solid var(--lantern); outline-offset: 6px; border-radius: 6px; }
+.grave__sotoba { position: absolute; bottom: 30px; left: 58%; display: flex; gap: 3px; z-index: 0; }
+.grave__sotoba span { width: 9px; height: calc(var(--h) * .95 + 40px); background: linear-gradient(90deg, var(--wood), var(--wood-shadow));
+  clip-path: polygon(50% 0, 100% 9px, 100% 22px, 82% 26px, 100% 30px, 100% 100%, 0 100%, 0 30px, 18% 26px, 0 22px, 0 9px); opacity: .9; }
+.grave__sotoba span:nth-child(2) { height: calc(var(--h) * .8 + 34px); transform: rotate(4deg); transform-origin: bottom; }
+.grave__pillar { position: relative; z-index: 1; width: 46px; height: var(--h); display: grid; place-items: start center; padding-top: 12px;
+  background: linear-gradient(90deg, var(--granite-light) 0%, var(--granite) 22%, var(--granite) 70%, var(--granite-shadow) 100%);
+  clip-path: polygon(10% 0, 90% 0, 100% 6px, 100% 100%, 0 100%, 0 6px);
+  box-shadow: inset 0 -10px 18px rgba(0, 0, 0, .25); transform-origin: 50% 100%; transition: filter .4s ease; }
+.grave__name { writing-mode: vertical-rl; font-weight: 700; font-size: var(--fs); line-height: 1; letter-spacing: .02em; color: var(--gold);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .55); white-space: nowrap; max-height: calc(var(--h) - 40px); overflow: hidden; }
+.grave__name--two { white-space: normal; word-break: break-all; line-height: 1.15; text-align: start; }
+.grave__base { position: relative; z-index: 1; width: 70px; height: 12px; background: linear-gradient(180deg, var(--granite-light), var(--granite)); }
+.grave__base2 { position: relative; z-index: 1; width: 96px; height: 18px; background: linear-gradient(180deg, var(--granite), var(--granite-shadow));
+  box-shadow: 0 8px 14px rgba(0, 0, 0, .4); }
+.grave__offering { position: absolute; z-index: 2; bottom: 30px; left: 50%; transform: translateX(-50%); width: 96px; height: 0; }
+.grave__offering::before, .grave__offering::after { content: ""; position: absolute; bottom: 0; width: 8px; height: 18px; background: var(--granite-shadow);
+  border-radius: 2px 2px 0 0; box-shadow: 0 -7px 0 -1px var(--moss), -3px -11px 0 -2px #6f8f55, 3px -12px 0 -2px #6f8f55; }
+.grave__offering::before { left: 6px; } .grave__offering::after { right: 6px; }
+.grave__incense { position: absolute; z-index: 2; bottom: 31px; left: 50%; transform: translateX(-50%); width: 24px; height: 8px; background: var(--granite-shadow); border-radius: 2px; }
+.grave__incense i { position: absolute; bottom: 8px; width: 2px; height: 14px; background: #7b4f33; }
+.grave__incense i:nth-child(1) { left: 8px; transform: rotate(-6deg); } .grave__incense i:nth-child(2) { left: 13px; transform: rotate(5deg); }
+.grave__incense i::after { content: ""; position: absolute; top: -2px; left: -1px; width: 4px; height: 4px; border-radius: 50%; background: #ff8a4a; box-shadow: 0 0 6px 2px rgba(255, 130, 60, .6); }
+.smoke { position: absolute; z-index: 2; bottom: 50px; left: 50%; width: 30px; height: 90px; margin-left: -15px; pointer-events: none; }
+.smoke svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; transform-origin: 50% 100%;
+  -webkit-mask-image: linear-gradient(0deg, #000 35%, transparent 95%); mask-image: linear-gradient(0deg, #000 35%, transparent 95%); }
+.smoke path { fill: none; stroke: #d6d0ee; stroke-width: 1.6; stroke-linecap: round; }
+
+.jizo { position: absolute; z-index: 2; bottom: 0; left: -13px; width: 16px; height: 30px; }
+.jizo::before { content: ""; position: absolute; left: 4px; top: 0; width: 9px; height: 9px; border-radius: 50%; background: var(--granite-light); }
+.jizo::after { content: ""; position: absolute; left: 1px; bottom: 0; width: 15px; height: 21px; border-radius: 7px 7px 2px 2px;
+  background: linear-gradient(180deg, var(--shu) 0 7px, transparent 7px), var(--granite);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+.grave--forgotten .grave__pillar { background:
+  linear-gradient(0deg, rgba(93, 122, 69, .75) 0, rgba(93, 122, 69, 0) 38%),
+  linear-gradient(90deg, var(--granite-light) 0%, var(--granite) 22%, var(--granite) 70%, var(--granite-shadow) 100%); }
+.grave--forgotten .grave__base, .grave--forgotten .grave__base2 { background: linear-gradient(180deg, #59704a, var(--granite-shadow)); }
+.grave--forgotten .grave__incense i::after { background: #4b4036; box-shadow: none; }
+.grave--forgotten .grave__sotoba span { filter: brightness(.6) saturate(.6); }
+.grave--violent .grave__pillar { transform: rotate(-3.2deg); }
+.grave--violent .grave__sotoba span:first-child { transform: rotate(-9deg); transform-origin: bottom; }
+
+/* ---------- hitodama ---------- */
+.grave__flames { position: absolute; z-index: 3; inset: 0 0 auto 0; height: 70px; pointer-events: none; }
+.hitodama { --color: var(--flame-calm); position: absolute; display: inline-block; width: 13px; height: 28px; }
+.hitodama::before { content: ""; position: absolute; left: 0; bottom: 0; width: 13px; height: 13px; border-radius: 0 50% 50% 50%; transform: rotate(45deg);
+  background: radial-gradient(circle at 62% 62%, #fff 0 20%, var(--color) 58%, color-mix(in srgb, var(--color) 30%, transparent) 80%);
+  box-shadow: 0 0 16px 5px color-mix(in srgb, var(--color) 42%, transparent); }
+.hitodama::after { content: ""; position: absolute; left: 4px; bottom: 9px; width: 5px; height: 19px; border-radius: 50% 50% 40% 40% / 90% 90% 10% 10%;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--color) 85%, transparent), transparent); transform-origin: 50% 100%; transform: skewX(-14deg); }
+.grave__flames .hitodama { top: 18px; left: 66%; }
+.grave__flames .hitodama:nth-child(2) { top: 0; left: 22%; }
+.grave__flames .hitodama:nth-child(3) { top: 34px; left: 8%; }
+.flames-2 .hitodama { --color: var(--flame-uneasy); }
+.grave__flames .hitodama { transition: scale .5s cubic-bezier(.16, 1, .3, 1), opacity .5s ease; }
+.flames-3 .hitodama { --color: var(--flame-violent); }
+
+.alive .hitodama { animation: float 5.2s ease-in-out infinite; }
+.alive .hitodama:nth-child(2) { animation-duration: 6.1s; animation-delay: -2.2s; }
+.alive .hitodama:nth-child(3) { animation-duration: 4.4s; animation-delay: -1.1s; }
+.alive .flames-2 .hitodama { animation-duration: 3.2s; }
+.alive .flames-3 .hitodama { animation-duration: 2.6s; }
+.alive .flames-3 { animation: tremor .18s steps(2, end) infinite; }
+.alive:not(.grave--forgotten) .smoke svg { animation: rise 6s cubic-bezier(.3, .1, .4, 1) infinite; }
+.alive:not(.grave--forgotten) .smoke svg:nth-child(2) { animation-delay: -3s; }
+
+/* the hitodama ignite one by one the first time their terrace appears */
+@media (prefers-reduced-motion: no-preference) {
+  .js .terrace:not(.lit) .grave__flames .hitodama { opacity: 0; scale: .3; }
+  .js .terrace .grave__flames .hitodama { transition-delay: calc(min(var(--i, 0) * 70ms, 900ms) + 120ms); }
+  .js .terrace .grave.active .grave__flames .hitodama, .js .terrace .grave:hover .grave__flames .hitodama { transition-delay: 0s; }
+}
+
+/* ---------- yūrei ---------- */
+.yurei { position: absolute; z-index: 0; bottom: 40px; left: 50%; width: 84px; height: 132px; margin-left: -70px; pointer-events: none;
+  opacity: 0; transform: translateY(26px) scale(.94); filter: blur(5px);
+  transition: opacity .9s cubic-bezier(.16, 1, .3, 1), transform 1.2s cubic-bezier(.16, 1, .3, 1), filter .9s ease; }
+
+/* ---------- approaching ---------- */
+.grave.active .grave__pillar, .grave:hover .grave__pillar { filter: brightness(1.18); }
+.grave.active .grave__name { text-shadow: 0 1px 0 rgba(0, 0, 0, .55), 0 0 12px rgba(255, 220, 150, .35); }
+.grave.active:not(.grave--forgotten) .smoke svg { animation-duration: 3.4s; }
+.grave.active:not(.grave--forgotten) .smoke path { stroke: #e9e4fa; }
+.grave__incense i::after { transition: scale .35s cubic-bezier(.16, 1, .3, 1); }
+.grave.active:not(.grave--forgotten) .grave__incense i::after { scale: 1.7; }
+.grave.active .grave__flames .hitodama { scale: 1.15; }
+.grave.active .yurei, .grave--violent:hover .yurei { opacity: .92; transform: translateY(0) scale(1); filter: blur(0); }
+.grave.active .yurei { animation: hang 4s ease-in-out 1.2s infinite; }
+
+/* ---------- mist ---------- */
+.mist { position: fixed; left: -20vw; right: -20vw; bottom: 0; height: 38vh; z-index: 4; pointer-events: none; }
+.mist span { position: absolute; bottom: -12vh; width: 70vw; height: 30vh; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(190, 196, 235, .22), rgba(190, 196, 235, 0) 70%); animation: drift 46s ease-in-out infinite alternate; }
+.mist span:nth-child(1) { left: 0; }
+.mist span:nth-child(2) { left: 40vw; bottom: -6vh; animation-duration: 62s; animation-delay: -20s; }
+.mist span:nth-child(3) { left: 80vw; animation-duration: 54s; animation-delay: -9s; }
+
+/* ---------- washi ---------- */
+.washi { position: fixed; z-index: 10; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(960px, calc(100% - 32px));
+  max-height: 48vh; overflow: auto; overscroll-behavior: contain;
+  background: linear-gradient(180deg, var(--washi), var(--washi-deep)); color: var(--sumi); border-radius: 4px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .6), 0 2px 0 rgba(255, 255, 255, .5) inset;
+  display: grid; grid-template-columns: auto 1fr; gap: 6px 22px; padding: 18px 24px 20px;
+  scrollbar-color: var(--wood-shadow) transparent; }
+.washi ::selection { background: var(--shu); color: var(--washi); }
+.washi__close { all: unset; position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; display: grid; place-items: center;
+  border-radius: 4px; color: var(--sumi-soft); cursor: pointer; }
+.washi__close:hover { color: var(--shu); background: rgba(200, 64, 43, .08); }
+.washi__close:focus-visible { outline: 2px solid var(--shu); outline-offset: 1px; }
+.washi[data-empty] .washi__close { display: none; }
+.washi__seal { grid-row: span 2; align-self: start; width: 52px; height: 52px; font-size: 1.15rem; margin-top: 4px; }
+.washi__seal:empty { background: transparent; box-shadow: inset 0 0 0 2px rgba(200, 64, 43, .5); }
+.washi h3 { margin: 0; padding-right: 36px; font-size: 1.25rem; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+.washi__path { margin: 0; color: var(--sumi-soft); font-size: .85rem; overflow-wrap: anywhere; }
+.washi__body { grid-column: 2; display: grid; gap: 8px; min-width: 0; }
+.washi__meta { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .9rem; color: var(--sumi-soft); font-variant-numeric: lining-nums; }
+.washi__meta b { color: var(--sumi); font-weight: 700; }
+.washi__epitaph { overflow-wrap: anywhere; margin: 2px 0 0; font-size: clamp(1.05rem, 2.2vw, 1.2rem); line-height: 1.65; max-width: 68ch; min-height: 1.65em; }
+.washi__epitaph::after { content: ""; display: inline-block; width: 2px; height: 1em; margin-left: 3px; vertical-align: -2px; background: var(--shu); opacity: 0; }
+.washi.typing .washi__epitaph::after { opacity: 1; animation: blink .9s steps(1, end) infinite; }
+.washi__words { margin: 0; font-size: .92rem; color: var(--sumi-soft); }
+.washi__words q { color: var(--sumi); }
+.washi__reasons { margin: 0; font-size: .88rem; color: #8a2c1d; }
+.washi__reasons:empty { display: none; }
+.washi__autopsy { margin: 0; font-size: .88rem; color: var(--sumi-soft); }
+.washi__autopsy:empty { display: none; }
+.washi__autopsy b { color: var(--sumi); font-weight: 700; }
+.washi__autopsy [lang="ja"] { color: var(--shu); margin-right: 4px; }
+.washi[data-empty] .washi__meta, .washi[data-empty] .washi__words { display: none; }
+.sound { position: fixed; z-index: 11; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 12px 7px 10px; border: 1px solid var(--ground-edge); border-radius: 4px; background: rgba(7, 9, 32, .72);
+  color: var(--text-soft); font: inherit; font-size: .85rem; cursor: pointer; transition: color .2s ease, border-color .2s ease; }
+.sound:hover { color: var(--text); border-color: var(--granite-light); }
+.sound svg { width: 18px; height: 18px; flex: none; }
+.sound .sound__wave { opacity: 0; transition: opacity .25s ease; }
+.sound[aria-pressed="true"] { color: var(--text); border-color: var(--lantern); }
+.sound[aria-pressed="true"] .sound__wave { opacity: 1; }
+.sound[aria-pressed="true"] .sound__mute { opacity: 0; }
+/* one hitodama follows the cursor; only with a mouse and without reduced motion */
+.companion { position: fixed; z-index: 9; left: 0; top: 0; width: 13px; height: 28px; pointer-events: none; opacity: 0;
+  transform-origin: 6.5px 21.5px; transition: opacity .6s ease; will-change: transform; }
+.companion.awake { opacity: .9; }
+.companion.over-washi { opacity: 0; }
+.companion .hitodama { --color: var(--companion-color, var(--flame-calm)); transition: none; }
+.companion .hitodama::before, .companion .hitodama::after { transition: background .5s ease, box-shadow .5s ease; }
+.sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.records { display: none; }
+
+footer { text-align: center; color: var(--text-soft); font-size: .9rem; padding: 64px 16px 0; max-width: 60ch; margin: 0 auto; }
+
+/* ---------- motion ---------- */
+@keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 3px -11px; } }
+@keyframes tremor { 0% { transform: translateX(0); } 50% { transform: translateX(1.5px); } }
+@keyframes rise {
+  0% { opacity: 0; transform: translate(0, 18px) scale(.7, .5); }
+  22% { opacity: .75; }
+  60% { opacity: .5; transform: translate(2px, -8px) scale(1, 1.05); }
+  100% { opacity: 0; transform: translate(-3px, -30px) scale(1.25, 1.2); }
+}
+@keyframes hang { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+@keyframes drift { from { transform: translateX(-8vw); } to { transform: translateX(8vw); } }
+@keyframes twinkle { 50% { opacity: .3; } }
+@keyframes sway { 0%, 100% { rotate: -1.5deg; } 50% { rotate: 1.5deg; } }
+@keyframes flicker { 0%, 100% { filter: brightness(1); } 23% { filter: brightness(.86); } 27% { filter: brightness(1.05); } 61% { filter: brightness(.93); } 64% { filter: brightness(1); } }
+@keyframes blink { 50% { opacity: 0; } }
+
+@media (max-width: 640px) {
+  :root { --grave-scale: .84; }
+  .row { gap: 24px 10px; justify-content: center; }
+  .grave { padding-top: 56px; }
+  .washi { gap: 4px 12px; padding: 14px 14px 16px; bottom: 10px; width: calc(100% - 20px); max-height: 52vh; }
+  .washi__seal { width: 36px; height: 36px; font-size: .85rem; margin-top: 2px; }
+  .washi h3 { font-size: 1.1rem; }
+  .washi[data-empty] .washi__path { font-size: .82rem; }
+  .moon { top: 128px; right: 12px; width: 40px; }
+  .sound { top: 10px; left: 10px; padding: 8px; }
+  .sound span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .kanban__kanji { writing-mode: horizontal-tb; grid-column: 1 / -1; margin-bottom: 8px; }
+  .kanban { grid-template-columns: 1fr; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .grave.active .yurei { filter: none; }
+}
+|}</style>
+</head>
+<body>
+
+<button type="button" class="sound" aria-pressed="false" title="{c.texts.sound}">
+  <svg viewBox="0 0 18 18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.5 7 H5.5 L9.5 3.5 V14.5 L5.5 11 H2.5 Z" fill="currentColor" fill-opacity=".18"/>
+    <path class="sound__wave" d="M12 6.5 C13.2 7.6 13.2 10.4 12 11.5 M14.2 4.6 C16.4 6.8 16.4 11.2 14.2 13.4"/>
+    <path class="sound__mute" d="M12.5 7 L16 10.5 M16 7 L12.5 10.5"/>
+  </svg>
+  <span>{c.texts.sound}</span>
+</button>
+
+<div class="sky" aria-hidden="true">
+  <svg class="stars" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><circle class="star" cx="62" cy="48" r="1.3"/><circle class="star" cx="318" cy="96" r="1.1"/><circle class="star" cx="544" cy="64" r="1.5"/><circle class="star" cx="902" cy="190" r="1.2"/><circle class="star" cx="372" cy="200" r="1"/><circle class="star" cx="196" cy="268" r="1.2"/></svg>
+  <svg class="stars" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><circle class="star" cx="148" cy="122" r="1"/><circle class="star" cx="402" cy="22" r="1.2"/><circle class="star" cx="611" cy="16" r="1"/><circle class="star" cx="954" cy="58" r="1"/><circle class="star" cx="760" cy="230" r="1.1"/></svg>
+  <svg class="stars" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice"><circle class="star" cx="231" cy="34" r="1.6"/><circle class="star" cx="476" cy="140" r="1"/><circle class="star" cx="688" cy="110" r="1.3"/><circle class="star" cx="28" cy="210" r="1.1"/><circle class="star" cx="520" cy="250" r="1"/></svg>
+  <div class="moon"></div>
+  <svg class="hills" viewBox="0 0 1000 200" preserveAspectRatio="none">
+    <path d="M0 120 C120 80 220 96 330 112 C450 128 540 70 660 78 C780 86 860 120 1000 96 V200 H0 Z" fill="#141a40"/>
+    <path d="M0 150 C140 128 260 150 400 142 C540 134 640 110 780 126 C880 138 940 150 1000 144 V200 H0 Z" fill="#10153a"/>
+  </svg>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="kimono" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f2ff"/>
+      <stop offset=".55" stop-color="#dcd8f2" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#c8c2ea" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="yurei" viewBox="0 0 84 132">
+      <path d="M44 34 C30 36 24 50 25 68 C26 86 32 102 40 132 C43 120 47 112 50 126 C55 108 62 90 61 70 C60 50 56 36 44 34 Z" fill="url(#kimono)"/>
+      <path d="M31 50 C22 54 14 60 6 66 C8 70 11 72 14 71 C20 66 27 62 35 60 Z" fill="url(#kimono)"/>
+      <path d="M8 66 C6 72 7 77 10 79 M12 70 C11 76 12 80 15 81" stroke="#e8e5f7" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M44 6 C31 6 26 17 27 30 C28 46 23 62 28 80 L34 60 C33 46 36 37 44 36 C52 37 55 46 54 60 L60 82 C64 62 59 46 60 30 C61 17 57 6 44 6 Z" fill="#14121c"/>
+      <ellipse cx="44" cy="24" rx="7.5" ry="10" fill="#e9e7f6"/>
+      <path d="M36 15 C38 22 38 30 36 38 M52 15 C50 22 50 30 52 38" stroke="#14121c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M39 13 L44 19 L49 13 Z" fill="#fbfaff"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="portal">
+  <div class="lanterns">
+    <div class="chochin" aria-hidden="true"><div class="chochin__body"></div></div>
+    <div class="kanban">
+      <span class="kanban__kanji" lang="ja" aria-hidden="true">供養</span>
+      <div>
+        <h1>Kuyō</h1>
+        <p class="kanban__repo">{c.repo}</p>
+        <p class="kanban__total"><b>{c.total}</b> {c.texts.souls}</p>
+      </div>
+    </div>
+    <div class="chochin" aria-hidden="true"><div class="chochin__body"></div></div>
+  </div>
+  <ul class="census">
+    {#for s in c.census}
+    <li><span class="seal" lang="ja" aria-hidden="true">{s.kanji}</span>{s.label} <b>{s.count}</b></li>
+    {/for}
+  </ul>
+  <p class="legend" aria-hidden="true">
+    <span><i class="hitodama" style="--color: var(--flame-calm)"></i> &lt; 0.3</span>
+    <span><i class="hitodama" style="--color: var(--flame-uneasy)"></i><i class="hitodama" style="--color: var(--flame-uneasy)"></i> 0.3–0.6</span>
+    <span><i class="hitodama" style="--color: var(--flame-violent)"></i><i class="hitodama" style="--color: var(--flame-violent)"></i><i class="hitodama" style="--color: var(--flame-violent)"></i> ≥ 0.6</span>
+  </p>
+</header>
+
+<main>
+  {#for terrace in c.terraces}
+  <section class="terrace" aria-labelledby="terrace-{terrace_index}">
+    <div class="marker">
+      <div class="toro" aria-hidden="true"><span class="toro__kasa"></span><span class="toro__light"></span><span class="toro__post"></span><span class="toro__foot"></span></div>
+      <h2 id="terrace-{terrace_index}">{terrace.label}</h2>
+      <p>· {terrace.graves.size}</p>
+      {#if terrace.note}<p class="note">{terrace.note}</p>{/if}
+    </div>
+    <ol class="row">
+      {#for g in terrace.graves}
+      <li>
+        <button type="button" class="grave grave--{g.cause}" data-id="{g.id}" style="--h: {g.pillarHeight}px; --fs: {g.nameSize}px; --i: {g_index}"
+                aria-label="{g.name}, {g.causeLabel}" aria-describedby="r-{g.id}">
+          {#if g.violent}<svg class="yurei" aria-hidden="true"><use href="#yurei"/></svg>{/if}
+          <span class="grave__sotoba" aria-hidden="true"><span></span><span></span></span>
+          <span class="grave__pillar" aria-hidden="true"><span class="grave__name{#if g.twoColumns} grave__name--two{/if}">{g.name}</span></span>
+          <span class="grave__base" aria-hidden="true"></span>
+          <span class="grave__base2" aria-hidden="true"></span>
+          <span class="grave__offering" aria-hidden="true"></span>
+          {#if g.premature}<span class="jizo" aria-hidden="true"></span>{/if}
+          <span class="grave__incense" aria-hidden="true"><i></i><i></i></span>
+          <span class="smoke" aria-hidden="true"><svg viewBox="0 0 30 90"><path d="M14 90 C8 72 20 60 13 44 C7 30 19 18 14 0"/></svg><svg viewBox="0 0 30 90"><path d="M16 90 C22 74 10 62 17 46 C23 32 11 20 16 2"/></svg></span>
+          <span class="grave__flames flames-{g.flames}" aria-hidden="true">{#for i in g.flames}<span class="hitodama"></span>{/for}</span>
+        </button>
+      </li>
+      {/for}
+    </ol>
+    <div class="step" aria-hidden="true"></div>
+  </section>
+  {/for}
+</main>
+
+<footer><p>{c.texts.footer}</p></footer>
+
+<div class="companion" aria-hidden="true"><i class="hitodama"></i></div>
+
+<div class="mist" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<aside class="washi" data-empty aria-label="{c.texts.washiLabel}">
+  <button type="button" class="washi__close" aria-label="{c.texts.close}"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2 L12 12 M12 2 L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+  <span class="seal washi__seal" lang="ja" aria-hidden="true"></span>
+  <div class="washi__body">
+    <div>
+      {#if c.total == 0}
+      <h3 class="washi__name">{c.texts.empty}</h3>
+      <p class="washi__path">{c.texts.emptyDetail}</p>
+      {#else}
+      <h3 class="washi__name">{c.texts.invitation}</h3>
+      <p class="washi__path">{c.texts.invitationDetail}</p>
+      {/if}
+    </div>
+    <p class="washi__meta"></p>
+    <p class="washi__words"></p>
+    <p class="washi__epitaph" aria-hidden="true"></p>
+    <p class="washi__reasons"></p>
+    <p class="washi__autopsy"></p>
+    <p class="sr" aria-live="polite"></p>
+  </div>
+</aside>
+
+<div class="records">
+  {#for terrace in c.terraces}{#for g in terrace.graves}
+  <article id="r-{g.id}" data-cause="{g.cause}" data-kanji="{g.causeKanji}">
+    <h4 data-field="name">{g.name}</h4>
+    <p data-field="path">{g.path}</p>
+    <p data-field="meta"><span><b>{g.causeLabel}</b> · {c.texts.restlessness} {g.restlessness}</span> <span>{c.texts.lived} {g.life} · {g.born} – {g.died}</span> <span>{c.texts.diedAt} {g.hourOfDeath}</span></p>
+    <p data-field="words">{c.texts.lastWords}: <q>{g.lastWords}</q> · {g.hash}</p>
+    <p data-field="epitaph">{#if g.epitaph}{g.epitaph}{#else}{c.texts.noEpitaph}{/if}</p>
+    <p data-field="reasons">{#if g.reasons.isEmpty}{#else}{c.texts.whyRestless}: {#each g.reasons}{it}{#if it_hasNext} · {/if}{/each}{/if}</p>
+    {#if g.autopsied}<p data-field="autopsy"><span lang="ja" aria-hidden="true">師</span><b>{c.texts.autopsy}:</b> {#if g.lessons.isEmpty}{c.texts.noLessons}{#else}{#each g.lessons}{it}{#if it_hasNext}; {/if}{/each}{/if}</p>{/if}
+  </article>
+  {/for}{/for}
+</div>
+
+<script>{|
+(() => {
+  const washi = document.querySelector('.washi');
+  const part = (name) => washi.querySelector('.washi__' + name);
+  const live = washi.querySelector('[aria-live]');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  let active = null;
+  let writing = 0;
+  // giving focus back to the grave on close must not reopen the washi through the focus event
+  let returning = false;
+
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--washi-height', washi.offsetHeight + 'px');
+  }).observe(washi);
+
+  const visible = new IntersectionObserver((entries) => {
+    for (const e of entries) e.target.classList.toggle('alive', e.isIntersecting);
+  }, { rootMargin: '120px 0px' });
+  document.querySelectorAll('.grave').forEach((g) => visible.observe(g));
+
+  // the first time a terrace appears, its hitodama ignite one by one
+  const ignite = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      e.target.classList.add('lit');
+      ignite.unobserve(e.target);
+    }
+  }, { rootMargin: '0px 0px -12% 0px' });
+  document.querySelectorAll('.terrace').forEach((t) => ignite.observe(t));
+
+  function write(target, text) {
+    const mine = ++writing;
+    if (calm.matches) { target.textContent = text; washi.classList.remove('typing'); return; }
+    target.textContent = '';
+    washi.classList.add('typing');
+    let i = 0;
+    let before = performance.now();
+    const step = (now) => {
+      if (mine !== writing) return;
+      const n = Math.max(1, Math.floor((now - before) / 22));
+      if (now - before >= 22) {
+        i = Math.min(text.length, i + n);
+        before = now;
+        target.textContent = text.slice(0, i);
+      }
+      if (i < text.length) requestAnimationFrame(step);
+      else washi.classList.remove('typing');
+    };
+    requestAnimationFrame(step);
+  }
+
+  function approach(grave) {
+    if (grave === active) return;
+    active?.classList.remove('active');
+    active = grave;
+    grave.classList.add('active');
+    const record = document.getElementById('r-' + grave.dataset.id);
+    const field = (n) => record.querySelector('[data-field="' + n + '"]');
+    washi.removeAttribute('data-empty');
+    const seal = washi.querySelector('.washi__seal');
+    seal.textContent = record.dataset.kanji;
+    // the seal is stamped onto the washi, like a hanko
+    seal.animate(calm.matches
+      ? [{ opacity: 0 }, { opacity: 1 }]
+      : [{ opacity: 0, transform: 'scale(1.45) rotate(-8deg)' }, { opacity: 1, offset: .55, transform: 'scale(.94) rotate(1deg)' }, { opacity: 1, transform: 'scale(1) rotate(0)' }],
+      { duration: calm.matches ? 160 : 420, easing: 'cubic-bezier(.16, 1, .3, 1)' });
+    part('name').parentElement.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }],
+      { duration: calm.matches ? 1 : 260, easing: 'cubic-bezier(.16, 1, .3, 1)' });
+    sound.orin(record.dataset.cause);
+    part('name').textContent = field('name').textContent;
+    part('path').textContent = field('path').textContent;
+    part('meta').innerHTML = field('meta').innerHTML;
+    part('words').innerHTML = field('words').innerHTML;
+    part('reasons').textContent = field('reasons').textContent.trim();
+    part('autopsy').innerHTML = field('autopsy')?.innerHTML ?? '';
+    const epitaph = field('epitaph').textContent.trim();
+    live.textContent = epitaph;
+    write(part('epitaph'), epitaph);
+  }
+
+  const invitation = [part('name').textContent, part('path').textContent];
+  function leave() {
+    if (!active) return;
+    const back = active;
+    active.classList.remove('active');
+    active = null;
+    ++writing;
+    washi.classList.remove('typing');
+    washi.setAttribute('data-empty', '');
+    washi.querySelector('.washi__seal').textContent = '';
+    [part('name').textContent, part('path').textContent] = invitation;
+    for (const n of ['meta', 'words', 'epitaph', 'reasons', 'autopsy']) part(n).textContent = '';
+    live.textContent = '';
+    if (washi.contains(document.activeElement)) {
+      returning = true;
+      back.focus({ preventScroll: true });
+      returning = false;
+    }
+  }
+  washi.querySelector('.washi__close').addEventListener('click', leave);
+
+  // ---------- the hitodama that follows the visitor ----------
+  // It trails the cursor on a spring; its tail points back along the motion and stretches with speed.
+  // The frame loop only runs while it is still arriving, and stops once it settles.
+  (() => {
+    const mouse = matchMedia('(pointer: fine)');
+    if (!mouse.matches || calm.matches) return;
+    const el = document.querySelector('.companion');
+    const colors = { 1: 'var(--flame-calm)', 2: 'var(--flame-uneasy)', 3: 'var(--flame-violent)' };
+    let targetX = 0, targetY = 0, x = 0, y = 0, angle = 0, stretch = 1, running = false, awake = false;
+
+    function frame(now) {
+      const vx = (targetX - x) * .11, vy = (targetY - y) * .11;
+      x += vx; y += vy;
+      const speed = Math.hypot(vx, vy);
+      // at rest the tail points up; in motion it points back
+      const wanted = speed > .4 ? Math.atan2(vy, vx) * 180 / Math.PI - 90 : 0;
+      let delta = ((wanted - angle + 540) % 360) - 180;
+      angle += delta * (speed > .4 ? .18 : .06);
+      stretch += (1 + Math.min(speed / 18, .7) - stretch) * .2;
+      const bob = Math.sin(now / 620) * 3;
+      el.style.transform = `translate3d(${x}px, ${y + bob}px, 0) rotate(${angle}deg) scale(${1 / Math.sqrt(stretch)}, ${stretch})`;
+      if (speed > .05 || Math.abs(delta) > .5 || Math.abs(stretch - 1) > .01) requestAnimationFrame(frame);
+      else { running = false; float(); }
+    }
+    // once settled it only bobs, through the animation engine, with no frame loop
+    function float() { el.animate([{ translate: '0 0' }, { translate: '2px -6px' }, { translate: '0 0' }], { duration: 3200, iterations: Infinity, easing: 'ease-in-out', composite: 'add' }); }
+
+    addEventListener('pointermove', (e) => {
+      if (e.pointerType !== 'mouse') return;
+      // it floats a little above and to the right, so it never covers the cursor
+      targetX = e.clientX + 16; targetY = e.clientY - 40;
+      if (!awake) { x = targetX; y = targetY + 20; awake = true; el.classList.add('awake'); }
+      const grave = e.target.closest?.('.grave');
+      const flames = grave?.querySelector('.grave__flames')?.className.match(/flames-(\d)/)?.[1];
+      el.style.setProperty('--companion-color', colors[flames] ?? 'var(--flame-calm)');
+      el.classList.toggle('over-washi', !!e.target.closest?.('.washi, .sound'));
+      if (!running) { running = true; el.getAnimations().forEach((a) => a.cancel()); requestAnimationFrame(frame); }
+    }, { passive: true });
+    document.documentElement.addEventListener('pointerleave', () => el.classList.remove('awake'));
+    document.documentElement.addEventListener('pointerenter', () => { if (awake) el.classList.add('awake'); });
+  })();
+
+  // ---------- sound ----------
+  // Everything is synthesized: no audio files, so the page is still a single file.
+  // Off by default; it only starts after the visitor asks for it.
+  const sound = (() => {
+    const button = document.querySelector('.sound');
+    let ctx = null, master = null, on = false, crickets = 0;
+
+    function noise(seconds) {
+      const b = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate);
+      const d = b.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      return b;
+    }
+
+    function prepare() {
+      ctx = new AudioContext();
+      master = ctx.createGain();
+      master.gain.value = 0;
+      master.connect(ctx.destination);
+
+      // wind: noise through a low band-pass, breathing slowly
+      const wind = ctx.createBufferSource();
+      wind.buffer = noise(4);
+      wind.loop = true;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass'; filter.frequency.value = 380; filter.Q.value = .6;
+      const volume = ctx.createGain(); volume.gain.value = .05;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = .07;
+      const depth = ctx.createGain(); depth.gain.value = .035;
+      lfo.connect(depth).connect(volume.gain);
+      const lfo2 = ctx.createOscillator(); lfo2.frequency.value = .031;
+      const sweep = ctx.createGain(); sweep.gain.value = 140;
+      lfo2.connect(sweep).connect(filter.frequency);
+      wind.connect(filter).connect(volume).connect(master);
+      wind.start(); lfo.start(); lfo2.start();
+    }
+
+    // suzumushi, the bell cricket of autumn nights: short, high trills from different places
+    function cricket() {
+      if (!on) return;
+      const now = ctx.currentTime;
+      const pan = ctx.createStereoPanner(); pan.pan.value = Math.random() * 1.6 - .8;
+      pan.connect(master);
+      const freq = 4300 + Math.random() * 500;
+      const pulses = 3 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < pulses; i++) {
+        const t0 = now + i * .085;
+        const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t0);
+        g.gain.linearRampToValueAtTime(.012, t0 + .012);
+        g.gain.exponentialRampToValueAtTime(.0001, t0 + .07);
+        o.connect(g).connect(pan); o.start(t0); o.stop(t0 + .08);
+      }
+      crickets = setTimeout(cricket, 900 + Math.random() * 2600);
+    }
+
+    // orin, the bell of Buddhist rites: inharmonic partials with long tails.
+    // Each cause has its own pitch; a violent death rings two nearly tuned bells that beat against each other.
+    const pitches = { natural: 587, premature: 784, forgotten: 466, violent: 415 };
+    function orin(cause) {
+      if (!on) return;
+      const now = ctx.currentTime + .01;
+      const base = pitches[cause] ?? 587;
+      const partials = [[1, .11, 5.5], [2.76, .05, 3.2], [5.4, .025, 1.8], [8.93, .012, 1]];
+      const detunes = cause === 'violent' ? [0, 3.1] : [0];
+      const soft = cause === 'forgotten' ? .55 : 1;
+      for (const d of detunes) {
+        for (const [ratio, amp, tail] of partials) {
+          const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = base * ratio + d;
+          const g = ctx.createGain();
+          g.gain.setValueAtTime(0, now);
+          g.gain.linearRampToValueAtTime(amp * soft / detunes.length, now + .006);
+          g.gain.exponentialRampToValueAtTime(.0001, now + tail);
+          o.connect(g).connect(master); o.start(now); o.stop(now + tail + .05);
+        }
+      }
+    }
+
+    function toggle() {
+      on = !on;
+      button.setAttribute('aria-pressed', String(on));
+      if (on) {
+        if (!ctx) prepare();
+        ctx.resume();
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.setTargetAtTime(1, ctx.currentTime, .6);
+        clearTimeout(crickets); cricket();
+      } else if (ctx) {
+        clearTimeout(crickets);
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.setTargetAtTime(0, ctx.currentTime, .15);
+      }
+    }
+    button.addEventListener('click', toggle);
+
+    // nothing plays in a hidden tab
+    document.addEventListener('visibilitychange', () => {
+      if (!ctx || !on) return;
+      if (document.hidden) { clearTimeout(crickets); ctx.suspend(); }
+      else { ctx.resume(); cricket(); }
+    });
+
+    return { orin };
+  })();
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') leave(); });
+
+  document.querySelectorAll('.grave').forEach((g) => {
+    g.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') approach(g); });
+    g.addEventListener('focus', () => { if (!returning) approach(g); });
+    g.addEventListener('click', () => approach(g));
+  });
+})();
+|}</script>
+</body>
+</html>

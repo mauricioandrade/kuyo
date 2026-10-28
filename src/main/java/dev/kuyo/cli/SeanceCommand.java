@@ -1,12 +1,12 @@
 package dev.kuyo.cli;
 
-import dev.kuyo.dominio.Alma;
-import dev.kuyo.dominio.Falecido;
-import dev.kuyo.dominio.Legista;
-import dev.kuyo.epitafio.Lingua;
-import dev.kuyo.epitafio.ModeloDoMonge;
-import dev.kuyo.epitafio.Mosteiro;
-import dev.kuyo.git.Exumador;
+import dev.kuyo.domain.Coroner;
+import dev.kuyo.domain.Deceased;
+import dev.kuyo.domain.Soul;
+import dev.kuyo.epitaph.Language;
+import dev.kuyo.epitaph.Monastery;
+import dev.kuyo.epitaph.MonkModel;
+import dev.kuyo.git.Exhumer;
 import dev.kuyo.seance.Medium;
 import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
@@ -22,111 +22,112 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-@Command(name = "seance", description = "Conversa com um arquivo morto.")
+@Command(name = "seance", description = "Talks to a dead file.")
 public class SeanceCommand implements Callable<Integer> {
 
-    private static final List<String> DESPEDIDAS = List.of("/bye", "/sair", "tchau", "bye", "adeus", "goodbye");
+    /** In both languages the ghost speaks. */
+    private static final List<String> FAREWELLS = List.of("/bye", "/sair", "tchau", "bye", "adeus", "goodbye");
 
-    @Parameters(index = "0", description = "Caminho do repositório git.")
+    @Parameters(index = "0", description = "Path of the git repository.")
     Path repo;
 
-    @Parameters(index = "1", description = "O arquivo morto: caminho completo ou só o nome.")
-    String arquivo;
+    @Parameters(index = "1", description = "The dead file: its full path or just its name.")
+    String file;
 
-    @Option(names = "--lang", defaultValue = "en", description = "Língua do fantasma: ${COMPLETION-CANDIDATES}.")
-    Lingua lingua;
+    @Option(names = "--lang", defaultValue = "en", description = "Language of the ghost: ${COMPLETION-CANDIDATES}.")
+    Language language;
 
-    @Option(names = {"-p", "--pergunta"}, description = "Pergunta sem abrir a conversa interativa (pode repetir).")
-    List<String> perguntas;
-
-    @Inject
-    Exumador exumador;
+    @Option(names = {"-q", "--question"}, description = "Asks without opening the interactive session (repeatable).")
+    List<String> questions;
 
     @Inject
-    Legista legista;
+    Exhumer exhumer;
 
     @Inject
-    Mosteiro mosteiro;
+    Coroner coroner;
+
+    @Inject
+    Monastery monastery;
 
     @Override
     public Integer call() throws Exception {
-        List<Falecido> mortos = exumador.exumar(repo);
-        Optional<Falecido> escolhido = escolher(mortos);
-        if (escolhido.isEmpty()) {
+        List<Deceased> dead = exhumer.exhume(repo);
+        Optional<Deceased> chosen = choose(dead);
+        if (chosen.isEmpty()) {
             return 1;
         }
-        Optional<String> problema = mosteiro.problema();
-        if (problema.isPresent()) {
-            System.err.println(problema.get());
+        Optional<String> problem = monastery.problem();
+        if (problem.isPresent()) {
+            System.err.println(problem.get());
             return 1;
         }
 
-        Alma alma = legista.examinar(escolhido.get());
-        String nome = nome(alma.falecido().caminho());
-        Medium medium = new Medium(ModeloDoMonge.criar(400), alma, lingua);
+        Soul soul = coroner.examine(chosen.get());
+        String name = name(soul.deceased().path());
+        Medium medium = new Medium(MonkModel.create(400), soul, language);
 
-        System.out.printf("%n  O incenso é aceso. %s, %s, responde.%n%n", alma.falecido().caminho(),
-                alma.causa().name().toLowerCase(Locale.ROOT));
-        falar(nome, medium.chamar());
+        System.out.printf("%n  The incense is lit. %s, %s, answers.%n%n", soul.deceased().path(),
+                soul.cause().name().toLowerCase(Locale.ROOT));
+        speak(name, medium.call());
 
-        if (perguntas != null) {
-            for (String pergunta : perguntas) {
-                System.out.printf("> %s%n", pergunta);
-                falar(nome, medium.perguntar(pergunta));
+        if (questions != null) {
+            for (String question : questions) {
+                System.out.printf("> %s%n", question);
+                speak(name, medium.ask(question));
             }
             return 0;
         }
 
-        System.out.println("  (escreva /bye para deixar o espírito descansar)\n");
-        BufferedReader entrada = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+        System.out.println("  (type /bye to let the spirit rest)\n");
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         while (true) {
             System.out.print("> ");
             System.out.flush();
-            String pergunta = entrada.readLine();
-            if (pergunta == null || DESPEDIDAS.contains(pergunta.strip().toLowerCase(Locale.ROOT))) {
-                System.out.println("\n  O incenso apaga. O espírito volta a descansar.");
+            String question = input.readLine();
+            if (question == null || FAREWELLS.contains(question.strip().toLowerCase(Locale.ROOT))) {
+                System.out.println("\n  The incense goes out. The spirit returns to its rest.");
                 return 0;
             }
-            if (!pergunta.isBlank()) {
-                falar(nome, medium.perguntar(pergunta));
+            if (!question.isBlank()) {
+                speak(name, medium.ask(question));
             }
         }
     }
 
-    /** Aceita o caminho completo ou só o nome; se o arquivo morreu mais de uma vez, chama a última vida. */
-    private Optional<Falecido> escolher(List<Falecido> mortos) {
-        List<Falecido> exatos = mortos.stream().filter(f -> f.caminho().equals(arquivo)).toList();
-        List<Falecido> candidatos = !exatos.isEmpty() ? exatos : mortos.stream()
-                .filter(f -> f.caminho().endsWith("/" + arquivo) || nome(f.caminho()).equals(arquivo))
+    /** Accepts the full path or just the name; if the file died more than once, calls its last life. */
+    private Optional<Deceased> choose(List<Deceased> dead) {
+        List<Deceased> exact = dead.stream().filter(d -> d.path().equals(file)).toList();
+        List<Deceased> candidates = !exact.isEmpty() ? exact : dead.stream()
+                .filter(d -> d.path().endsWith("/" + file) || name(d.path()).equals(file))
                 .toList();
 
-        if (candidatos.isEmpty()) {
-            System.err.printf("Nenhum arquivo morto chamado %s.%n", arquivo);
-            String busca = arquivo.toLowerCase(Locale.ROOT);
-            mortos.stream().map(Falecido::caminho).distinct()
-                    .filter(c -> c.toLowerCase(Locale.ROOT).contains(busca))
+        if (candidates.isEmpty()) {
+            System.err.printf("No dead file named %s.%n", file);
+            String search = file.toLowerCase(Locale.ROOT);
+            dead.stream().map(Deceased::path).distinct()
+                    .filter(p -> p.toLowerCase(Locale.ROOT).contains(search))
                     .limit(5)
-                    .forEach(c -> System.err.println("  talvez: " + c));
+                    .forEach(p -> System.err.println("  perhaps: " + p));
             return Optional.empty();
         }
 
-        List<String> caminhos = candidatos.stream().map(Falecido::caminho).distinct().toList();
-        if (caminhos.size() > 1) {
-            System.err.printf("Mais de um %s está enterrado aqui. Diga qual:%n", arquivo);
-            caminhos.forEach(c -> System.err.println("  " + c));
+        List<String> paths = candidates.stream().map(Deceased::path).distinct().toList();
+        if (paths.size() > 1) {
+            System.err.printf("More than one %s is buried here. Say which:%n", file);
+            paths.forEach(p -> System.err.println("  " + p));
             return Optional.empty();
         }
-        if (candidatos.size() > 1) {
-            System.out.printf("  %s morreu %d vezes; chamando a última vida.%n", caminhos.getFirst(), candidatos.size());
+        if (candidates.size() > 1) {
+            System.out.printf("  %s died %d times; calling its last life.%n", paths.getFirst(), candidates.size());
         }
-        return Optional.of(candidatos.getLast());
+        return Optional.of(candidates.getLast());
     }
 
-    private static void falar(String nome, String fala) {
-        System.out.printf("%s: %s%n%n", nome, fala);
+    private static void speak(String name, String words) {
+        System.out.printf("%s: %s%n%n", name, words);
     }
 
-    private static String nome(String caminho) {
-        return caminho.substring(caminho.lastIndexOf('/') + 1);
+    private static String name(String path) {
+        return path.substring(path.lastIndexOf('/') + 1);
     }
 }

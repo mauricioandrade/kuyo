@@ -11,7 +11,7 @@ inputs:
     default: "."
   output:
     description: Where to write the cemetery. The epitaph cache (kuyo.json) goes next to it.
-    default: cemiterio.html
+    default: cemetery.html
   lang:
     description: Language of the epitaphs and the page, "en" or "pt".
     default: en
@@ -54,12 +54,12 @@ runs:
         REPO: ${{ inputs.path }}
         OUTPUT: ${{ inputs.output }}
       run: |
-        # o Exumador precisa do histórico inteiro; um checkout raso enterraria quase ninguém
+        # the Exhumer needs the whole history; a shallow checkout would bury almost no one
         if [ "$(git -C "$REPO" rev-parse --is-shallow-repository)" = "true" ]; then
           git -C "$REPO" fetch --quiet --unshallow
         fi
-        mortos=$(java -jar "$GITHUB_ACTION_PATH/target/quarkus-app/quarkus-run.jar" scan "$REPO")
-        souls=$(grep -c '^✝' <<< "$mortos" || true)
+        dead=$(java -jar "$GITHUB_ACTION_PATH/target/quarkus-app/quarkus-run.jar" scan "$REPO")
+        souls=$(grep -c '^✝' <<< "$dead" || true)
         echo "souls=$souls" >> "$GITHUB_OUTPUT"
         echo "dir=$(dirname "$OUTPUT")" >> "$GITHUB_OUTPUT"
 
@@ -103,14 +103,14 @@ runs:
       env:
         REPO: ${{ inputs.path }}
         OUTPUT: ${{ inputs.output }}
-        LINGUA: ${{ inputs.lang }}
-        KUYO_MODELO: ${{ inputs.model }}
+        LANGUAGE: ${{ inputs.lang }}
+        KUYO_MODEL: ${{ inputs.model }}
         EPITAPHS: ${{ inputs.epitaphs }}
         AUTOPSY: ${{ inputs.autopsy }}
         SOULS: ${{ steps.dead.outputs.souls }}
       run: |
-        args=(bury "$REPO" -o "$OUTPUT" --lang "$LINGUA")
-        if [ "$EPITAPHS" != "true" ]; then args+=(--sem-epitafios); fi
-        if [ "$AUTOPSY" = "true" ]; then args+=(--autopsia); fi
+        args=(bury "$REPO" -o "$OUTPUT" --lang "$LANGUAGE")
+        if [ "$EPITAPHS" != "true" ]; then args+=(--no-epitaphs); fi
+        if [ "$AUTOPSY" = "true" ]; then args+=(--autopsy); fi
         java -jar "$GITHUB_ACTION_PATH/target/quarkus-app/quarkus-run.jar" "${args[@]}"
         printf '## 供養 Kuyō\n\n%s souls laid to rest in `%s`.\n' "$SOULS" "$OUTPUT" >> "$GITHUB_STEP_SUMMARY"

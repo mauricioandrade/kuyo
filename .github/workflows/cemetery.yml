@@ -1,7 +1,7 @@
 name: Cemetery
 
-# A cada push na main, o Kuyō enterra os próprios mortos e publica o site:
-# o docs/ (o cemitério de demonstração) e, em /self/, o cemitério deste repositório.
+# On every push to main, Kuyō buries its own dead and publishes the site:
+# docs/ (the demo cemetery) and, under /self/, this repository's cemetery.
 on:
   push:
     branches: [main]

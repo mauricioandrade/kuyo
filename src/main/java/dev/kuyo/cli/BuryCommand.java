@@ -1,14 +1,14 @@
 package dev.kuyo.cli;
 
-import dev.kuyo.autopsia.Shisho;
-import dev.kuyo.cemiterio.Cemiterio;
-import dev.kuyo.cemiterio.Textos;
-import dev.kuyo.dominio.Alma;
-import dev.kuyo.dominio.Legista;
-import dev.kuyo.epitafio.Epitafista;
-import dev.kuyo.epitafio.Lingua;
-import dev.kuyo.epitafio.Mosteiro;
-import dev.kuyo.git.Exumador;
+import dev.kuyo.autopsy.Shisho;
+import dev.kuyo.cemetery.Cemetery;
+import dev.kuyo.cemetery.Texts;
+import dev.kuyo.domain.Coroner;
+import dev.kuyo.domain.Soul;
+import dev.kuyo.epitaph.EpitaphWriter;
+import dev.kuyo.epitaph.Language;
+import dev.kuyo.epitaph.Monastery;
+import dev.kuyo.git.Exhumer;
 import io.quarkus.qute.Location;
 import io.quarkus.qute.Template;
 import jakarta.inject.Inject;
@@ -24,112 +24,114 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-@Command(name = "bury", description = "Escreve os epitáfios e gera o cemitério em HTML.")
+@Command(name = "bury", description = "Writes the epitaphs and renders the cemetery as HTML.")
 public class BuryCommand implements Callable<Integer> {
 
-    @Parameters(index = "0", description = "Caminho do repositório git.", defaultValue = ".")
+    @Parameters(index = "0", description = "Path of the git repository.", defaultValue = ".")
     Path repo;
 
-    @Option(names = {"-o", "--saida"}, defaultValue = "cemiterio.html", description = "Arquivo HTML de saída.")
-    Path saida;
+    @Option(names = {"-o", "--output"}, defaultValue = "cemetery.html", description = "Output HTML file.")
+    Path output;
 
-    @Option(names = "--lang", defaultValue = "en", description = "Língua dos epitáfios: ${COMPLETION-CANDIDATES}.")
-    Lingua lingua;
+    @Option(names = "--lang", defaultValue = "en", description = "Language of the epitaphs: ${COMPLETION-CANDIDATES}.")
+    Language language;
 
-    @Option(names = "--sem-epitafios", description = "Gera o cemitério sem chamar o modelo.")
-    boolean semEpitafios;
+    @Option(names = "--no-epitaphs", description = "Renders the cemetery without calling the model.")
+    boolean noEpitaphs;
 
-    @Option(names = "--autopsia", description = "Pede ao Shishō que examine o último conteúdo de cada arquivo Java morto.")
-    boolean autopsia;
+    @Option(names = "--autopsy", description = "Asks the Shishō to examine the last contents of every dead Java file.")
+    boolean autopsy;
 
     @Inject
-    Exumador exumador;
+    Exhumer exhumer;
 
     @Inject
     Shisho shisho;
 
     @Inject
-    Legista legista;
+    Coroner coroner;
 
     @Inject
-    Epitafista epitafista;
+    EpitaphWriter epitaphWriter;
 
     @Inject
-    Mosteiro mosteiro;
+    Monastery monastery;
 
     @Inject
-    @Location("cemiterio.html")
-    Template cemiterio;
+    @Location("cemetery.html")
+    Template cemetery;
 
     @ConfigProperty(name = "kuyo.ollama.url")
-    String urlOllama;
+    String ollamaUrl;
 
     @Override
     public Integer call() throws Exception {
-        List<Alma> almas = exumador.exumar(repo).stream().map(legista::examinar).toList();
-        // o cemitério vazio também é publicado: numa Action, a página existe antes do primeiro morto
-        if (almas.isEmpty()) {
-            System.out.println("Nenhum arquivo morto. Ninguém para velar.");
+        List<Soul> souls = exhumer.exhume(repo).stream().map(coroner::examine).toList();
+        // the empty cemetery is published too: in an Action, the page exists before the first death
+        if (souls.isEmpty()) {
+            System.out.println("No dead files. Nobody to mourn.");
         }
 
-        if (autopsia && !almas.isEmpty()) {
-            Optional<String> problema = shisho.problema();
-            if (problema.isPresent()) {
-                System.err.println(problema.get());
+        if (autopsy && !souls.isEmpty()) {
+            Optional<String> problem = shisho.problem();
+            if (problem.isPresent()) {
+                System.err.println(problem.get());
                 return 1;
             }
-            almas = autopsiar(almas);
+            souls = performAutopsies(souls);
         }
 
-        Path pasta = saida.toAbsolutePath().getParent();
-        Files.createDirectories(pasta);
-        if (!semEpitafios && !almas.isEmpty()) {
-            Optional<String> problema = mosteiro.problema();
-            if (problema.isPresent()) {
-                System.err.println(problema.get());
-                System.err.println("Para gerar o cemitério sem epitáfios, use --sem-epitafios.");
+        Path folder = output.toAbsolutePath().getParent();
+        Files.createDirectories(folder);
+        if (!noEpitaphs && !souls.isEmpty()) {
+            epitaphWriter.openCache(folder.resolve("kuyo.json"));
+            // with every epitaph already cached, the monk does not need to be awake
+            boolean allCached = souls.stream().allMatch(s -> epitaphWriter.cached(s, language));
+            Optional<String> problem = allCached ? Optional.empty() : monastery.problem();
+            if (problem.isPresent()) {
+                System.err.println(problem.get());
+                System.err.println("To render the cemetery without epitaphs, use --no-epitaphs.");
                 return 1;
             }
-            epitafista.abrirCache(pasta.resolve("kuyo.json"));
             try {
-                almas = escreverEpitafios(almas);
+                souls = writeEpitaphs(souls);
             } catch (RuntimeException e) {
-                System.err.printf("%nO monge não respondeu. O Ollama está rodando em %s com o modelo baixado?%n  %s%n",
-                        urlOllama, e.getMessage());
+                System.err.printf("%nThe monk did not answer. Is Ollama running at %s with the model pulled?%n  %s%n",
+                        ollamaUrl, e.getMessage());
                 return 1;
             }
         }
 
-        String nomeRepo = repo.toAbsolutePath().normalize().getFileName().toString().replaceFirst("\\.git$", "");
-        String html = cemiterio.data("c", Cemiterio.montar(nomeRepo, almas, Textos.de(lingua))).render();
-        Files.writeString(saida, html);
-        System.out.printf("%n%d almas sepultadas em %s%n", almas.size(), saida.toAbsolutePath());
+        String repoName = repo.toAbsolutePath().normalize().getFileName().toString().replaceFirst("\\.git$", "");
+        String html = cemetery.data("c", Cemetery.build(repoName, souls, Texts.of(language))).render();
+        Files.writeString(output, html);
+        System.out.printf("%n%d souls laid to rest in %s%n", souls.size(), output.toAbsolutePath());
         return 0;
     }
 
-    private List<Alma> autopsiar(List<Alma> almas) throws Exception {
-        List<Alma> examinadas = new ArrayList<>(almas.size());
-        for (Alma alma : almas) {
-            if (shisho.examina(alma.falecido())) {
-                System.out.printf("師 autópsia de %s%n", alma.falecido().caminho());
-                alma = shisho.examinar(alma.falecido(), exumador.arquivoDeBuild(repo, alma.falecido()), lingua)
-                        .map(alma::comAutopsia)
-                        .orElse(alma);
+    private List<Soul> performAutopsies(List<Soul> souls) throws Exception {
+        List<Soul> examined = new ArrayList<>(souls.size());
+        for (Soul soul : souls) {
+            if (shisho.examines(soul.deceased())) {
+                System.out.printf("師 autopsy of %s%n", soul.deceased().path());
+                soul = shisho.examine(soul.deceased(), exhumer.buildFile(repo, soul.deceased()), language)
+                        .map(soul::withAutopsy)
+                        .orElse(soul);
             }
-            examinadas.add(alma);
+            examined.add(soul);
         }
-        return examinadas;
+        return examined;
     }
 
-    private List<Alma> escreverEpitafios(List<Alma> almas) throws Exception {
-        List<Alma> comEpitafio = new ArrayList<>(almas.size());
-        for (int i = 0; i < almas.size(); i++) {
-            Alma alma = almas.get(i);
-            boolean emCache = epitafista.emCache(alma, lingua);
-            System.out.printf("[%d/%d] ✝ %s%s%n", i + 1, almas.size(), alma.falecido().caminho(),
-                    emCache ? "  (cache)" : "");
-            comEpitafio.add(alma.comEpitafio(epitafista.epitafio(alma, lingua)));
+    private List<Soul> writeEpitaphs(List<Soul> souls) throws Exception {
+        List<Soul> withEpitaph = new ArrayList<>(souls.size());
+        for (int i = 0; i < souls.size(); i++) {
+            Soul soul = souls.get(i);
+            boolean cached = epitaphWriter.cached(soul, language);
+            System.out.printf("[%d/%d] ✝ %s%s%n", i + 1, souls.size(), soul.deceased().path(),
+                    cached ? "  (cache)" : "");
+            withEpitaph.add(soul.withEpitaph(epitaphWriter.epitaph(soul, language)));
         }
-        return comEpitafio;
+        return withEpitaph;
     }
 }

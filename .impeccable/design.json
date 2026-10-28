@@ -4,16 +4,16 @@
   "title": "Design System: Kuyō",
   "extensions": {
     "colorMeta": {
-      "noite": { "role": "neutral", "displayName": "Aizome Night" },
-      "granito": { "role": "neutral", "displayName": "Granite" },
+      "night": { "role": "neutral", "displayName": "Aizome Night" },
+      "granite": { "role": "neutral", "displayName": "Granite" },
       "washi": { "role": "neutral", "displayName": "Washi Paper" },
       "sumi": { "role": "neutral", "displayName": "Sumi Ink" },
       "shu": { "role": "primary", "displayName": "Shu Vermilion" },
-      "lanterna": { "role": "secondary", "displayName": "Lantern Amber" },
-      "chama-calma": { "role": "tertiary", "displayName": "Calm Hitodama" },
-      "chama-agitada": { "role": "tertiary", "displayName": "Agitated Hitodama" },
-      "chama-violenta": { "role": "tertiary", "displayName": "Violent Hitodama" },
-      "ouro": { "role": "secondary", "displayName": "Gold Leaf Carving" }
+      "lantern": { "role": "secondary", "displayName": "Lantern Amber" },
+      "flame-calm": { "role": "tertiary", "displayName": "Calm Hitodama" },
+      "flame-uneasy": { "role": "tertiary", "displayName": "Agitated Hitodama" },
+      "flame-violent": { "role": "tertiary", "displayName": "Violent Hitodama" },
+      "gold": { "role": "secondary", "displayName": "Gold Leaf Carving" }
     },
     "typographyMeta": {
       "kanji": { "displayName": "Signboard Kanji", "purpose": "供養 on the kanban, vertical." },
@@ -39,8 +39,8 @@
       "kind": "chip",
       "refersTo": "seal",
       "description": "Cause of death as a vermilion hanko seal.",
-      "html": "<span class=\"ds-selo\" lang=\"ja\">横死</span>",
-      "css": ".ds-selo { display: inline-grid; place-items: center; width: 30px; height: 30px; background: #c8402b; color: #f1e9d8; font: 700 .78rem/1 'Shippori Mincho B1', serif; border-radius: 4px; writing-mode: vertical-rl; box-shadow: 0 2px 6px rgba(0,0,0,.35); }"
+      "html": "<span class=\"ds-seal\" lang=\"ja\">横死</span>",
+      "css": ".ds-seal { display: inline-grid; place-items: center; width: 30px; height: 30px; background: #c8402b; color: #f1e9d8; font: 700 .78rem/1 'Shippori Mincho B1', serif; border-radius: 4px; writing-mode: vertical-rl; box-shadow: 0 2px 6px rgba(0,0,0,.35); }"
     },
     {
       "name": "Washi Strip",

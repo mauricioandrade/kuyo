@@ -47,9 +47,9 @@ nb-configuration.xml
 # Windows (WSL)
 *:Zone.Identifier
 
-# saída do kuyo rodando na raiz do projeto
-/cemiterio.html
+# kuyo output when run at the project root
+/cemetery.html
 /kuyo.json
 
-# capturas de revisão de design
+# design review captures
 /.impeccable/review/

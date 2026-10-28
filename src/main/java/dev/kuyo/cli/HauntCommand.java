@@ -1,8 +1,8 @@
 package dev.kuyo.cli;
 
-import dev.kuyo.assombracao.Assombracao;
-import dev.kuyo.assombracao.Assombracao.Sussurro;
-import dev.kuyo.epitafio.Lingua;
+import dev.kuyo.epitaph.Language;
+import dev.kuyo.haunt.Haunting;
+import dev.kuyo.haunt.Haunting.Whisper;
 import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -14,117 +14,117 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 @Command(name = "haunt",
-        description = {"Assombra o shell: os arquivos que você apaga sussurram de volta.",
-                "Instale com: eval \"$(kuyo haunt)\" no ~/.bashrc ou ~/.zshrc."})
+        description = {"Haunts your shell: the files you delete whisper back.",
+                "Install with: kuyo haunt >> ~/.bashrc (or ~/.zshrc)."})
 public class HauntCommand implements Callable<Integer> {
 
     enum Shell { bash, zsh }
 
     @Parameters(index = "0", arity = "0..1",
-            description = "Uma linha de comando que acabou de rodar. Sem ela, imprime o hook do shell.")
-    String linha;
+            description = "A command line that just ran. Without it, prints the shell hook.")
+    String line;
 
-    @Option(names = "--shell", description = "Shell do hook: ${COMPLETION-CANDIDATES}. Padrão: o do $SHELL.")
+    @Option(names = "--shell", description = "Shell of the hook: ${COMPLETION-CANDIDATES}. Default: the one in $SHELL.")
     Shell shell;
 
-    @Option(names = "--lang", defaultValue = "en", description = "Língua dos sussurros: ${COMPLETION-CANDIDATES}.")
-    Lingua lingua;
+    @Option(names = "--lang", defaultValue = "en", description = "Language of the whispers: ${COMPLETION-CANDIDATES}.")
+    Language language;
 
-    @Option(names = "--sem-monge", description = "Só frases fixas, sem chamar o modelo.")
-    boolean semMonge;
+    @Option(names = "--no-monk", description = "Fixed lines only, without calling the model.")
+    boolean noMonk;
 
-    @Option(names = "--comando", description = "Como o hook chama o Kuyō. Padrão: este mesmo java e jar.")
-    String comando;
+    @Option(names = "--command", description = "How the hook calls Kuyō. Default: this same java and jar.")
+    String command;
 
     @Inject
-    Assombracao assombracao;
+    Haunting haunting;
 
     @Override
     public Integer call() {
-        if (linha == null) {
-            System.out.print(hook(shell != null ? shell : shellDoUsuario(), invocacao()));
+        if (line == null) {
+            System.out.print(hook(shell != null ? shell : userShell(), invocation()));
             return 0;
         }
-        // um fantasma nunca mostra stack trace: fora de um repositório, ou com o git confuso, só fica quieto
-        List<Sussurro> sussurros;
+        // a ghost never shows a stack trace: outside a repository, or with git confused, it just stays quiet
+        List<Whisper> whispers;
         try {
-            sussurros = assombracao.ouvir(Path.of("").toAbsolutePath(), linha, lingua, !semMonge);
+            whispers = haunting.listen(Path.of("").toAbsolutePath(), line, language, !noMonk);
         } catch (Exception e) {
             if (System.getenv("KUYO_DEBUG") != null) {
                 e.printStackTrace();
             }
             return 0;
         }
-        if (!sussurros.isEmpty()) {
-            System.out.print(desenhar(sussurros, System.getenv("NO_COLOR") == null));
+        if (!whispers.isEmpty()) {
+            System.out.print(draw(whispers, System.getenv("NO_COLOR") == null));
             System.out.flush();
         }
         return 0;
     }
 
-    static String desenhar(List<Sussurro> sussurros, boolean cor) {
-        String voz = cor ? "\033[3;38;5;141m" : "";
-        String nota = cor ? "\033[2m" : "";
-        String fim = cor ? "\033[0m" : "";
+    static String draw(List<Whisper> whispers, boolean color) {
+        String voice = color ? "\033[3;38;5;141m" : "";
+        String dim = color ? "\033[2m" : "";
+        String reset = color ? "\033[0m" : "";
         StringBuilder sb = new StringBuilder("\n");
-        for (Sussurro s : sussurros) {
-            sb.append("  ").append(voz).append("霊 ").append(s.fala()).append(fim).append('\n');
-            if (s.nota() != null) {
-                sb.append("     ").append(nota).append(s.nota()).append(fim).append('\n');
+        for (Whisper w : whispers) {
+            sb.append("  ").append(voice).append("霊 ").append(w.words()).append(reset).append('\n');
+            if (w.note() != null) {
+                sb.append("     ").append(dim).append(w.note()).append(reset).append('\n');
             }
         }
         return sb.toString();
     }
 
-    private String invocacao() {
-        if (comando != null) {
-            return comando;
+    private String invocation() {
+        if (command != null) {
+            return command;
         }
         String classpath = System.getProperty("java.class.path", "");
         if (!classpath.endsWith(".jar") || classpath.contains(java.io.File.pathSeparator)) {
             return "kuyo";
         }
         String java = ProcessHandle.current().info().command().orElse("java");
-        // o log do Quarkus no terminal estragaria o sussurro
-        return String.join(" ", aspas(java), "-Dquarkus.log.console.enable=false", "-jar",
-                aspas(Path.of(classpath).toAbsolutePath().toString()));
+        // Quarkus logging on the terminal would spoil the whisper
+        return String.join(" ", quote(java), "-Dquarkus.log.console.enable=false", "-jar",
+                quote(Path.of(classpath).toAbsolutePath().toString()));
     }
 
-    private static Shell shellDoUsuario() {
+    private static Shell userShell() {
         String s = System.getenv().getOrDefault("SHELL", "");
         return s.endsWith("zsh") ? Shell.zsh : Shell.bash;
     }
 
-    static String aspas(String s) {
+    static String quote(String s) {
         return "'" + s.replace("'", "'\\''") + "'";
     }
 
-    String hook(Shell shell, String invocacao) {
-        List<String> opcoes = new ArrayList<>(List.of("haunt", "--lang", lingua.name()));
-        if (semMonge) {
-            opcoes.add("--sem-monge");
+    String hook(Shell shell, String invocation) {
+        List<String> options = new ArrayList<>(List.of("haunt", "--lang", language.name()));
+        if (noMonk) {
+            options.add("--no-monk");
         }
-        // o filtro é largo e barato; quem decide se alguém morreu é o Kuyō, em segundo plano,
-        // para o prompt voltar na hora e o sussurro chegar alguns segundos depois
-        String comum = """
+        // the filter is wide and cheap; Kuyō decides whether anyone died, in the background,
+        // so the prompt comes back at once and the whisper arrives a few seconds later
+        String common = """
                 # 供養 kuyo haunt: the files you delete whisper back.
-                __kuyo_sussurro() {
+                __kuyo_whisper() {
                   case "$1" in
                     *rm\\ *|*git*commit*|*git*reset*|*git*clean*|*git*push*|*git*branch*|*git*stash*|*git*checkout*|*git*restore*) ;;
                     *) return ;;
                   esac
                   ( %s %s -- "$1" & ) 2>/dev/null
                 }
-                """.formatted(invocacao, String.join(" ", opcoes));
-        return comum + switch (shell) {
+                """.formatted(invocation, String.join(" ", options));
+        return common + switch (shell) {
             case bash -> """
-                    __kuyo_ultimo=$(HISTTIMEFORMAT= history 1)
+                    __kuyo_last=$(HISTTIMEFORMAT= history 1)
                     __kuyo_precmd() {
                       local s=$? h
                       h=$(HISTTIMEFORMAT= history 1)
-                      if [ "$h" != "$__kuyo_ultimo" ]; then
-                        __kuyo_ultimo=$h
-                        __kuyo_sussurro "${h#"${h%%[![:space:][:digit:]*]*}"}"
+                      if [ "$h" != "$__kuyo_last" ]; then
+                        __kuyo_last=$h
+                        __kuyo_whisper "${h#"${h%%[![:space:][:digit:]*]*}"}"
                       fi
                       return $s
                     }
@@ -134,11 +134,11 @@ public class HauntCommand implements Callable<Integer> {
                     esac
                     """;
             case zsh -> """
-                    __kuyo_preexec() { __kuyo_linha=$1 }
+                    __kuyo_preexec() { __kuyo_line=$1 }
                     __kuyo_precmd() {
                       local s=$?
-                      [[ -n $__kuyo_linha ]] && __kuyo_sussurro "$__kuyo_linha"
-                      __kuyo_linha=
+                      [[ -n $__kuyo_line ]] && __kuyo_whisper "$__kuyo_line"
+                      __kuyo_line=
                       return $s
                     }
                     autoload -Uz add-zsh-hook

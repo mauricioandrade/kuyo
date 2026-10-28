@@ -29,7 +29,7 @@ Feito para o desafio DEV Hacktoberfest 2026, semana 4: *Ghost in the Machine*.
   <img src="docs/demo.gif" alt="Caminhando pelo cemitério: ao se aproximar de um túmulo violento, um yūrei surge enquanto o epitáfio é escrito na faixa de washi" width="100%">
 </p>
 
-<p align="center"><a href="https://mauricioandrade.github.io/kuyo/cemiterio.html"><b>Caminhe pelo cemitério →</b></a></p>
+<p align="center"><a href="https://mauricioandrade.github.io/kuyo/cemetery.html"><b>Caminhe pelo cemitério →</b></a></p>
 
 > O cemitério do demo vem do **stocklentes-hub, um repositório privado meu**: 137 arquivos apagados em cinco meses. O código continua privado; aqui aparecem só nomes de arquivo, datas, mensagens de commit e os epitáfios que o Gemma escreveu para eles. É esse o ponto do Kuyō: o código nunca saiu da minha máquina para gerar esta página.
 
@@ -58,16 +58,16 @@ java -jar target/quarkus-app/quarkus-run.jar scan caminho/do/repo
 
 | Opção | Efeito |
 |---|---|
-| `--ordem inquietacao` | ordena pela inquietação em vez da ordem cronológica |
-| `--laudo` | mostra cada fator por trás da inquietação |
+| `--order restlessness` | ordena pela inquietação em vez da ordem cronológica |
+| `--findings` | mostra cada fator por trás da inquietação |
 
 ```
-✝ src/lib/rate-limit.ts  [VIOLENTA · 0.66]
-    2026-06-05 02:14 → 2026-06-12 01:55 -03:00  (6 dias, 1 commits, 16 linhas)
-    autores: mauricioandrade
-    morto em 135a99b3 por mauricioandrade: "fix: limite de tamanho nos inputs de palpites e awards; remove rate-limit em memoria"
-    commit: 3 arquivos, -18 linhas, sem testes
-    laudo: tamanho 0.39 · hora 1.00 · mensagem 1.00 · sem testes 1.00 · vida curta 0.22
+✝ src/lib/rate-limit.ts  [VIOLENT · 0.66]
+    2026-06-05 02:14 → 2026-06-12 01:55 -03:00  (6 days, 1 commits, 16 lines)
+    authors: mauricioandrade
+    killed in 135a99b3 by mauricioandrade: "fix: limite de tamanho nos inputs de palpites e awards; remove rate-limit em memoria"
+    commit: 3 files, -18 lines, without tests
+    findings: size 0.39 · hour 1.00 · message 1.00 · no tests 1.00 · short life 0.22
 ```
 
 Apagado à 1h55 da manhã, num commit cuja mensagem diz `remove`, sem testes. Uma morte violenta.
@@ -75,10 +75,10 @@ Apagado à 1h55 da manhã, num commit cuja mensagem diz `remove`, sem testes. Um
 ### 🕯️ Sepultando
 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar bury caminho/do/repo -o cemiterio.html --lang pt
+java -jar target/quarkus-app/quarkus-run.jar bury caminho/do/repo -o cemetery.html --lang pt
 ```
 
-O Gemma escreve um epitáfio por alma, cerca de um segundo cada na minha máquina, e o Kuyō gera um único `cemiterio.html` autocontido: uma caminhada noturna por um cemitério japonês, um terraço por mês (ou por dia, quando um mês tem mortes demais). A altura do pilar é o tempo de vida do arquivo, as chamas são a inquietação, túmulos violentos ficam tortos e erguem um yūrei, os esquecidos criam musgo. Aproxime-se de um túmulo para ler o epitáfio.
+O Gemma escreve um epitáfio por alma, cerca de um segundo cada na minha máquina, e o Kuyō gera um único `cemetery.html` autocontido: uma caminhada noturna por um cemitério japonês, um terraço por mês (ou por dia, quando um mês tem mortes demais). A altura do pilar é o tempo de vida do arquivo, as chamas são a inquietação, túmulos violentos ficam tortos e erguem um yūrei, os esquecidos criam musgo. Aproxime-se de um túmulo para ler o epitáfio.
 
 <p align="center"><img src="docs/gifs/scared.gif" alt="Uma garota de anime gritando de pavor" width="320"></p>
 
@@ -87,20 +87,20 @@ O Gemma escreve um epitáfio por alma, cerca de um segundo cada na minha máquin
 | Opção | Efeito |
 |---|---|
 | `--lang en\|pt` | língua dos epitáfios (padrão `en`) |
-| `--sem-epitafios` | gera o cemitério sem chamar o modelo |
-| `--autopsia` | pede ao Shishō que examine cada arquivo Java morto (veja abaixo) |
+| `--no-epitaphs` | gera o cemitério sem chamar o modelo |
+| `--autopsy` | pede ao Shishō que examine cada arquivo Java morto (veja abaixo) |
 
 Os epitáfios ficam em cache num `kuyo.json` ao lado da saída, pela chave commit da morte, língua e modelo, então rodar de novo é instantâneo. O modelo é configurado em tempo de execução, sem recompilar:
 
 | Variável de ambiente | Padrão |
 |---|---|
-| `KUYO_MODELO` | `gemma4:e4b` |
+| `KUYO_MODEL` | `gemma4:e4b` |
 | `KUYO_OLLAMA_URL` | `http://localhost:11434` |
 | `KUYO_SHISHO` | `shisho` (um comando no `PATH` ou o caminho de um `shisho.jar`) |
 
 ### 師 Autópsia
 
-Com `--autopsia`, cada arquivo Java morto vai para a mesa do [Shishō](https://github.com/mauricioandrade/shisho), o meu revisor de código Java. O Kuyō grava o último conteúdo do arquivo numa pasta temporária, ao lado do `pom.xml` ou `build.gradle` com que ele viveu, roda `shisho analyze` e entalha no túmulo só as lições encontradas no próprio morto:
+Com `--autopsy`, cada arquivo Java morto vai para a mesa do [Shishō](https://github.com/mauricioandrade/shisho), o meu revisor de código Java. O Kuyō grava o último conteúdo do arquivo numa pasta temporária, ao lado do `pom.xml` ou `build.gradle` com que ele viveu, roda `shisho analyze` e entalha no túmulo só as lições encontradas no próprio morto:
 
 > 師 **Autópsia do Shishō:** média · No centralized error handling (linha 21)
 
@@ -123,7 +123,7 @@ um ato de remoção bem direto.
 
 <p align="center"><img src="docs/gifs/that-was-scary.gif" alt="That was scary!" width="245"></p>
 
-Aceita o caminho completo ou só o nome do arquivo. `-p "pergunta"` pergunta sem abrir a conversa interativa, e `/bye` deixa o espírito descansar.
+Aceita o caminho completo ou só o nome do arquivo. `-q "pergunta"` pergunta sem abrir a conversa interativa, e `/bye` deixa o espírito descansar.
 
 ### 霊 Assombração
 
@@ -142,7 +142,7 @@ $
 
 Antes do commit, o arquivo é examinado como se morresse agora, com o seu comando como últimas palavras, então ele já sabe do que vai morrer. Depois do `git commit`, as almas que aquele commit levou falam uma vez, já mortas. Outras formas de perder trabalho ganham uma frase fixa: `git reset --hard`, `git clean -f`, `git push --force`, `git branch -D`, `git stash drop` e `git checkout -- .`. Todo o resto recebe silêncio.
 
-O hook são poucas linhas de shell que você pode ler no seu arquivo rc. Ele só chama o Kuyō para comandos que podem matar alguma coisa, e roda em segundo plano para o prompt voltar na hora. `--sem-monge` usa frases fixas em vez do modelo e `NO_COLOR` é respeitado.
+O hook são poucas linhas de shell que você pode ler no seu arquivo rc. Ele só chama o Kuyō para comandos que podem matar alguma coisa, e roda em segundo plano para o prompt voltar na hora. `--no-monk` usa frases fixas em vez do modelo e `NO_COLOR` é respeitado.
 
 ### 🤖 GitHub Action
 
@@ -178,7 +178,7 @@ jobs:
 | Entrada | Padrão | Efeito |
 |---|---|---|
 | `path` | `.` | repositório a enterrar |
-| `output` | `cemiterio.html` | onde gravar o cemitério |
+| `output` | `cemetery.html` | onde gravar o cemitério |
 | `lang` | `en` | `en` ou `pt` |
 | `model` | `gemma4:e4b` | modelo do Ollama para os epitáfios |
 | `epitaphs` | `true` | `false` dispensa o modelo, e o Ollama nem é instalado |
@@ -221,9 +221,9 @@ Os pesos foram calibrados com 175 mortes reais em nove repositórios meus. O pri
 
 Verificada nesta ordem:
 
-1. ⚔️ **VIOLENTA**: inquietação ≥ 0,6
-2. 🥀 **PREMATURA**: viveu menos de um dia
-3. 🕸️ **ESQUECIDA**: passou mais de um ano sem ser tocada antes de ser apagada
+1. ⚔️ **VIOLENT** (violenta): inquietação ≥ 0,6
+2. 🥀 **PREMATURE** (prematura): viveu menos de um dia
+3. 🕸️ **FORGOTTEN** (esquecida): passou mais de um ano sem ser tocada antes de ser apagada
 4. 🕯️ **NATURAL**: todo o resto
 
 <p align="center"><img src="docs/gifs/triggered.gif" alt="TRIGGERED" width="240"></p>

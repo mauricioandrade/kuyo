@@ -29,7 +29,7 @@ Built for the DEV Hacktoberfest 2026 challenge, week 4: *Ghost in the Machine*.
   <img src="docs/demo.gif" alt="Walking the cemetery: approaching a violent grave raises a yūrei while its epitaph is brushed onto a washi strip" width="100%">
 </p>
 
-<p align="center"><a href="https://mauricioandrade.github.io/kuyo/cemiterio.html"><b>Walk the cemetery yourself →</b></a></p>
+<p align="center"><a href="https://mauricioandrade.github.io/kuyo/cemetery.html"><b>Walk the cemetery yourself →</b></a></p>
 
 > The demo cemetery comes from **stocklentes-hub, a private repository of mine**: 137 deleted files over five months. Its code stays private; only file names, dates, commit messages and the epitaphs Gemma wrote for them appear here. That is the point of Kuyō: the code never left my machine to produce this page.
 
@@ -58,29 +58,27 @@ java -jar target/quarkus-app/quarkus-run.jar scan path/to/repo
 
 | Option | Effect |
 |---|---|
-| `--ordem inquietacao` | sort by restlessness instead of chronologically |
-| `--laudo` | print every factor behind the restlessness score |
+| `--order restlessness` | sort by restlessness instead of chronologically |
+| `--findings` | print every factor behind the restlessness score |
 
 ```
-✝ src/lib/rate-limit.ts  [VIOLENTA · 0.66]
-    2026-06-05 02:14 → 2026-06-12 01:55 -03:00  (6 dias, 1 commits, 16 linhas)
-    autores: mauricioandrade
-    morto em 135a99b3 por mauricioandrade: "fix: limite de tamanho nos inputs de palpites e awards; remove rate-limit em memoria"
-    commit: 3 arquivos, -18 linhas, sem testes
-    laudo: tamanho 0.39 · hora 1.00 · mensagem 1.00 · sem testes 1.00 · vida curta 0.22
+✝ src/lib/rate-limit.ts  [VIOLENT · 0.66]
+    2026-06-05 02:14 → 2026-06-12 01:55 -03:00  (6 days, 1 commits, 16 lines)
+    authors: mauricioandrade
+    killed in 135a99b3 by mauricioandrade: "fix: limite de tamanho nos inputs de palpites e awards; remove rate-limit em memoria"
+    commit: 3 files, -18 lines, without tests
+    findings: size 0.39 · hour 1.00 · message 1.00 · no tests 1.00 · short life 0.22
 ```
 
 Deleted at 1:55 a.m., in a commit whose message says `remove`, with no tests. A violent death.
 
-The CLI output is in Portuguese for now.
-
 ### 🕯️ Burying
 
 ```bash
-java -jar target/quarkus-app/quarkus-run.jar bury path/to/repo -o cemiterio.html
+java -jar target/quarkus-app/quarkus-run.jar bury path/to/repo -o cemetery.html
 ```
 
-Gemma writes one epitaph per soul, about a second each on my machine, and Kuyō renders a single self-contained `cemiterio.html`: a night walk through a Japanese cemetery, one terrace per month (or per day, when a month holds too many deaths). Pillar height is the file's lifespan, the flames are its restlessness, violent graves lean and raise a yūrei, forgotten ones grow moss. Approach a grave to read its epitaph.
+Gemma writes one epitaph per soul, about a second each on my machine, and Kuyō renders a single self-contained `cemetery.html`: a night walk through a Japanese cemetery, one terrace per month (or per day, when a month holds too many deaths). Pillar height is the file's lifespan, the flames are its restlessness, violent graves lean and raise a yūrei, forgotten ones grow moss. Approach a grave to read its epitaph.
 
 <p align="center"><img src="docs/gifs/scared.gif" alt="An anime girl screaming in terror" width="320"></p>
 
@@ -89,20 +87,20 @@ Gemma writes one epitaph per soul, about a second each on my machine, and Kuyō 
 | Option | Effect |
 |---|---|
 | `--lang en\|pt` | language of the epitaphs (default `en`) |
-| `--sem-epitafios` | render the cemetery without calling the model |
-| `--autopsia` | ask the Shishō to examine every dead Java file (see below) |
+| `--no-epitaphs` | render the cemetery without calling the model |
+| `--autopsy` | ask the Shishō to examine every dead Java file (see below) |
 
 Epitaphs are cached in a `kuyo.json` next to the output, keyed by death commit, language and model, so reruns are instant. The model is configured at runtime, no rebuild needed:
 
 | Environment variable | Default |
 |---|---|
-| `KUYO_MODELO` | `gemma4:e4b` |
+| `KUYO_MODEL` | `gemma4:e4b` |
 | `KUYO_OLLAMA_URL` | `http://localhost:11434` |
 | `KUYO_SHISHO` | `shisho` (a command on the `PATH`, or the path to a `shisho.jar`) |
 
 ### 師 Autopsy
 
-With `--autopsia`, every dead Java file goes on the table of [Shishō](https://github.com/mauricioandrade/shisho), my Java code reviewer. Kuyō writes the file's last contents to a temporary folder next to the `pom.xml` or `build.gradle` it lived with, runs `shisho analyze` on it, and carves on the grave only the lessons found in the dead file itself:
+With `--autopsy`, every dead Java file goes on the table of [Shishō](https://github.com/mauricioandrade/shisho), my Java code reviewer. Kuyō writes the file's last contents to a temporary folder next to the `pom.xml` or `build.gradle` it lived with, runs `shisho analyze` on it, and carves on the grave only the lessons found in the dead file itself:
 
 > 師 **The Shishō's autopsy:** medium · No centralized error handling (line 21)
 
@@ -128,7 +126,7 @@ EmailService.java: The dead do not know such things.
 
 <p align="center"><img src="docs/gifs/that-was-scary.gif" alt="That was scary!" width="245"></p>
 
-Pass a full path or just the file name. `--lang pt` makes the ghost speak Portuguese, `-p "question"` asks without opening the interactive session, and `/bye` lets the spirit rest.
+Pass a full path or just the file name. `--lang pt` makes the ghost speak Portuguese, `-q "question"` asks without opening the interactive session, and `/bye` lets the spirit rest.
 
 ### 霊 Haunting
 
@@ -147,7 +145,7 @@ $
 
 Before the commit, the file is examined as if it died right now, with your command as its last words, so it already knows how it will die. After `git commit`, the souls that commit took speak once, already dead. Other ways of losing work get a fixed line: `git reset --hard`, `git clean -f`, `git push --force`, `git branch -D`, `git stash drop` and `git checkout -- .`. Every other command gets silence.
 
-The hook is a few lines of shell that you can read in your rc file. It only calls Kuyō for commands that might kill something, and runs it in the background so your prompt comes back right away. `--sem-monge` uses fixed lines instead of the model, `--lang pt` whispers in Portuguese, and `NO_COLOR` is respected.
+The hook is a few lines of shell that you can read in your rc file. It only calls Kuyō for commands that might kill something, and runs it in the background so your prompt comes back right away. `--no-monk` uses fixed lines instead of the model, `--lang pt` whispers in Portuguese, and `NO_COLOR` is respected.
 
 ### 🤖 GitHub Action
 
@@ -183,7 +181,7 @@ jobs:
 | Input | Default | Effect |
 |---|---|---|
 | `path` | `.` | repository to bury |
-| `output` | `cemiterio.html` | where to write the cemetery |
+| `output` | `cemetery.html` | where to write the cemetery |
 | `lang` | `en` | `en` or `pt` |
 | `model` | `gemma4:e4b` | Ollama model for the epitaphs |
 | `epitaphs` | `true` | `false` skips the model, and Ollama is never installed |
@@ -226,9 +224,9 @@ The weights were calibrated against 175 real deaths across nine of my own reposi
 
 Checked in this order:
 
-1. ⚔️ **VIOLENTA** (violent): restlessness ≥ 0.6
-2. 🥀 **PREMATURA** (premature): lived less than a day
-3. 🕸️ **ESQUECIDA** (forgotten): untouched for more than a year before deletion
+1. ⚔️ **VIOLENT**: restlessness ≥ 0.6
+2. 🥀 **PREMATURE**: lived less than a day
+3. 🕸️ **FORGOTTEN**: untouched for more than a year before deletion
 4. 🕯️ **NATURAL**: everything else
 
 <p align="center"><img src="docs/gifs/triggered.gif" alt="TRIGGERED" width="240"></p>
