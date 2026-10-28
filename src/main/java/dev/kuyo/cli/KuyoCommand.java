@@ -8,6 +8,6 @@ import picocli.CommandLine.Command;
         mixinStandardHelpOptions = true,
         version = "kuyo 0.1.0",
         description = "供養 · um funeral para o código que se foi.",
-        subcommands = {ScanCommand.class, BuryCommand.class, SeanceCommand.class})
+        subcommands = {ScanCommand.class, BuryCommand.class, SeanceCommand.class, HauntCommand.class})
 public class KuyoCommand {
 }

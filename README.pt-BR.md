@@ -40,6 +40,7 @@ Feito para o desafio DEV Hacktoberfest 2026, semana 4: *Ghost in the Machine*.
 | `kuyo scan <repo>` | Lista os mortos e a causa mortis, sem LLM | ✅ funcionando |
 | `kuyo bury <repo> [-o saida]` | Escreve os epitáfios com o Gemma e gera o cemitério | ✅ funcionando |
 | `kuyo seance <repo> <arquivo>` | Conversa com um arquivo morto | ✅ funcionando |
+| `kuyo haunt` | Possui o seu shell: arquivos apagados sussurram de volta | ✅ funcionando |
 
 ## 🚀 Começando
 
@@ -123,6 +124,25 @@ um ato de remoção bem direto.
 <p align="center"><img src="docs/gifs/that-was-scary.gif" alt="That was scary!" width="245"></p>
 
 Aceita o caminho completo ou só o nome do arquivo. `-p "pergunta"` pergunta sem abrir a conversa interativa, e `/bye` deixa o espírito descansar.
+
+### 霊 Assombração
+
+```bash
+java -jar target/quarkus-app/quarkus-run.jar haunt --lang pt >> ~/.bashrc   # ou ~/.zshrc
+```
+
+Isso possui o seu shell. A partir daí, quando você apaga um arquivo rastreado, ele sussurra de volta um segundo depois, em primeira pessoa, com uma fala que o Gemma escreve a partir dos fatos da vida dele:
+
+```
+$ rm src/EmailService.java
+$
+  霊 Eu sou EmailService.java. Vivi 27 dias, em 2 commits, e ainda estou aqui, no HEAD. Por enquanto.
+     ainda dá tempo: git restore -SW -- ':/src/EmailService.java'
+```
+
+Antes do commit, o arquivo é examinado como se morresse agora, com o seu comando como últimas palavras, então ele já sabe do que vai morrer. Depois do `git commit`, as almas que aquele commit levou falam uma vez, já mortas. Outras formas de perder trabalho ganham uma frase fixa: `git reset --hard`, `git clean -f`, `git push --force`, `git branch -D`, `git stash drop` e `git checkout -- .`. Todo o resto recebe silêncio.
+
+O hook são poucas linhas de shell que você pode ler no seu arquivo rc. Ele só chama o Kuyō para comandos que podem matar alguma coisa, e roda em segundo plano para o prompt voltar na hora. `--sem-monge` usa frases fixas em vez do modelo e `NO_COLOR` é respeitado.
 
 ### 🤖 GitHub Action
 

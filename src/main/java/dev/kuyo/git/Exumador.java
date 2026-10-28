@@ -4,6 +4,7 @@ import dev.kuyo.autopsia.ArquivoDeBuild;
 import dev.kuyo.dominio.CommitDaMorte;
 import dev.kuyo.dominio.Falecido;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.Edit;
@@ -27,8 +28,11 @@ import org.eclipse.jgit.util.io.DisabledOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -36,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 /**
@@ -61,13 +66,96 @@ public class Exumador {
             ":Zone\\.Identifier$|(^|/)(\\.DS_Store|Thumbs\\.db|desktop\\.ini)$");
 
     public List<Falecido> exumar(Path caminhoRepo) throws IOException {
-        try (Repository repo = abrir(caminhoRepo);
-             RevWalk walk = new RevWalk(repo);
-             DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
+        try (Repository repo = abrir(caminhoRepo)) {
+            List<Falecido> mortos = new ArrayList<>();
+            percorrer(repo, mortos);
+            return mortos;
+        }
+    }
 
+    /**
+     * Os arquivos vivos no HEAD que o {@code condenado} aponta e que já sumiram do disco ou do índice,
+     * mas cuja morte ainda não virou commit. São examinados como se morressem agora, com o comando
+     * que os apagou como últimas palavras: dá para saber do que vão morrer antes do commit.
+     */
+    public List<Falecido> moribundos(Path caminhoRepo, Predicate<String> condenado, String ultimasPalavras)
+            throws IOException {
+        try (Repository repo = abrir(caminhoRepo); ObjectReader reader = repo.newObjectReader()) {
+            Map<String, Vida> vivos = percorrer(repo, new ArrayList<>());
+            ObjectId head = repo.resolve("HEAD^{tree}");
+            if (head == null || repo.isBare()) {
+                return List.of();
+            }
+            DirCache indice = repo.readDirCache();
+            Path raiz = repo.getWorkTree().toPath();
+
+            List<String> caminhos = new ArrayList<>();
+            for (String caminho : vivos.keySet()) {
+                if (condenado.test(caminho)
+                        && (!Files.exists(raiz.resolve(caminho)) || indice.findEntry(caminho) < 0)) {
+                    caminhos.add(caminho);
+                }
+            }
+            caminhos.sort(null);
+
+            List<byte[]> corpos = new ArrayList<>();
+            int linhasRemovidas = 0;
+            boolean mexeuEmTestes = false;
+            for (String caminho : caminhos) {
+                byte[] bytes = new byte[0];
+                try (TreeWalk tw = TreeWalk.forPath(repo, caminho, head)) {
+                    if (tw != null) {
+                        bytes = reader.open(tw.getObjectId(0)).getCachedBytes(Integer.MAX_VALUE);
+                    }
+                }
+                corpos.add(bytes);
+                linhasRemovidas += RawText.isBinary(bytes) ? 0 : new RawText(bytes).size();
+                mexeuEmTestes |= TESTE.matcher(caminho).find();
+            }
+
+            String autor = Optional.ofNullable(repo.getConfig().getString("user", null, "name")).orElse("?");
+            CommitDaMorte agora = new CommitDaMorte("", ultimasPalavras, autor, ZonedDateTime.now(),
+                    caminhos.size(), linhasRemovidas, mexeuEmTestes);
+            List<Falecido> moribundos = new ArrayList<>();
+            for (int i = 0; i < caminhos.size(); i++) {
+                moribundos.add(sepultar(caminhos.get(i), corpos.get(i), vivos.get(caminhos.get(i)), agora));
+            }
+            return moribundos;
+        }
+    }
+
+    /** A raiz da árvore de trabalho; vazia num clone --bare. */
+    public Optional<Path> raiz(Path caminhoRepo) throws IOException {
+        try (Repository repo = abrir(caminhoRepo)) {
+            return repo.isBare() ? Optional.empty() : Optional.of(repo.getWorkTree().toPath());
+        }
+    }
+
+    /** O hash curto do HEAD, se ele foi commitado há menos de {@code janela}. */
+    public Optional<String> commitRecente(Path caminhoRepo, Duration janela) throws IOException {
+        try (Repository repo = abrir(caminhoRepo); RevWalk walk = new RevWalk(repo)) {
             ObjectId head = repo.resolve("HEAD");
             if (head == null) {
-                return List.of();
+                return Optional.empty();
+            }
+            RevCommit commit = walk.parseCommit(head);
+            Instant quando = commit.getCommitterIdent().getWhenAsInstant();
+            return Duration.between(quando, Instant.now()).compareTo(janela) <= 0
+                    ? Optional.of(commit.getId().abbreviate(8).name())
+                    : Optional.empty();
+        }
+    }
+
+    /** Percorre o histórico guardando os mortos em {@code mortos}; devolve quem continua vivo no HEAD. */
+    private static Map<String, Vida> percorrer(Repository repo, List<Falecido> mortos) throws IOException {
+        try (RevWalk walk = new RevWalk(repo);
+             DiffFormatter df = new DiffFormatter(DisabledOutputStream.INSTANCE);
+             ObjectReader reader = repo.newObjectReader()) {
+
+            Map<String, Vida> vivos = new HashMap<>();
+            ObjectId head = repo.resolve("HEAD");
+            if (head == null) {
+                return vivos;
             }
 
             df.setRepository(repo);
@@ -79,10 +167,6 @@ public class Exumador {
             walk.sort(RevSort.TOPO);
             walk.sort(RevSort.REVERSE, true);
             walk.markStart(walk.parseCommit(head));
-
-            ObjectReader reader = repo.newObjectReader();
-            Map<String, Vida> vivos = new HashMap<>();
-            List<Falecido> mortos = new ArrayList<>();
 
             for (RevCommit commit : walk) {
                 RevCommit pai = commit.getParentCount() > 0 ? walk.parseCommit(commit.getParent(0)) : null;
@@ -117,12 +201,13 @@ public class Exumador {
                             if (vida == null) {
                                 vida = new Vida(quando, autor);
                             }
-                            mortos.add(sepultar(d, vida, commitDaMorte, reader));
+                            byte[] bytes = reader.open(d.getOldId().toObjectId()).getCachedBytes(Integer.MAX_VALUE);
+                            mortos.add(sepultar(d.getOldPath(), bytes, vida, commitDaMorte));
                         }
                     }
                 }
             }
-            return mortos;
+            return vivos;
         }
     }
 
@@ -197,16 +282,14 @@ public class Exumador {
                 mexeuEmTestes);
     }
 
-    private static Falecido sepultar(DiffEntry d, Vida vida, CommitDaMorte morte, ObjectReader reader)
-            throws IOException {
-        byte[] bytes = reader.open(d.getOldId().toObjectId()).getCachedBytes(Integer.MAX_VALUE);
+    private static Falecido sepultar(String caminho, byte[] bytes, Vida vida, CommitDaMorte morte) {
         boolean binario = RawText.isBinary(bytes);
         int linhas = binario ? 0 : new RawText(bytes).size();
         String conteudo = binario ? null
                 : new String(bytes, 0, Math.min(bytes.length, LIMITE_ULTIMO_CONTEUDO), StandardCharsets.UTF_8);
 
         return new Falecido(
-                d.getOldPath(),
+                caminho,
                 vida.nascimento,
                 morte.quando().toInstant(),
                 vida.ultimoCommit,

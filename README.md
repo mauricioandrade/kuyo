@@ -40,6 +40,7 @@ Built for the DEV Hacktoberfest 2026 challenge, week 4: *Ghost in the Machine*.
 | `kuyo scan <repo>` | Lists the dead and their cause of death, no LLM | ✅ working |
 | `kuyo bury <repo> [-o out]` | Writes epitaphs with Gemma and renders the cemetery | ✅ working |
 | `kuyo seance <repo> <file>` | Talk to a dead file | ✅ working |
+| `kuyo haunt` | Possesses your shell: deleted files whisper back | ✅ working |
 
 ## 🚀 Getting started
 
@@ -128,6 +129,25 @@ EmailService.java: The dead do not know such things.
 <p align="center"><img src="docs/gifs/that-was-scary.gif" alt="That was scary!" width="245"></p>
 
 Pass a full path or just the file name. `--lang pt` makes the ghost speak Portuguese, `-p "question"` asks without opening the interactive session, and `/bye` lets the spirit rest.
+
+### 霊 Haunting
+
+```bash
+java -jar target/quarkus-app/quarkus-run.jar haunt >> ~/.bashrc   # or ~/.zshrc
+```
+
+This possesses your shell. From then on, when you delete a tracked file the file whispers back a second later, in first person, written by Gemma from the facts of its life:
+
+```
+$ rm src/EmailService.java
+$
+  霊 I am EmailService.java. I lived 27 days, through 2 commits, and I'm still here, in HEAD. For now.
+     there is still time: git restore -SW -- ':/src/EmailService.java'
+```
+
+Before the commit, the file is examined as if it died right now, with your command as its last words, so it already knows how it will die. After `git commit`, the souls that commit took speak once, already dead. Other ways of losing work get a fixed line: `git reset --hard`, `git clean -f`, `git push --force`, `git branch -D`, `git stash drop` and `git checkout -- .`. Every other command gets silence.
+
+The hook is a few lines of shell that you can read in your rc file. It only calls Kuyō for commands that might kill something, and runs it in the background so your prompt comes back right away. `--sem-monge` uses fixed lines instead of the model, `--lang pt` whispers in Portuguese, and `NO_COLOR` is respected.
 
 ### 🤖 GitHub Action
 

@@ -69,7 +69,7 @@ public record Textos(
         return Locale.forLanguageTag(lang);
     }
 
-    String causa(CausaMortis causa) {
+    public String causa(CausaMortis causa) {
         boolean pt = lang.startsWith("pt");
         return switch (causa) {
             case VIOLENTA -> pt ? "Violenta" : "Violent";
@@ -79,7 +79,7 @@ public record Textos(
         };
     }
 
-    String vida(Duration vida) {
+    public String vida(Duration vida) {
         boolean pt = lang.startsWith("pt");
         if (vida.toDays() >= 1) {
             long d = vida.toDays();

@@ -111,7 +111,7 @@ public class Epitafista {
     }
 
     /** Modelos às vezes embrulham a resposta em aspas mesmo quando pedimos que não. */
-    static String limpar(String texto) {
+    public static String limpar(String texto) {
         String t = texto.strip();
         if (t.length() > 1 && (t.startsWith("\"") && t.endsWith("\"") || t.startsWith("“") && t.endsWith("”"))) {
             t = t.substring(1, t.length() - 1).strip();
